@@ -1,1 +1,1 @@
-/home/hjac/Life/Hobbies/Rust/solver/target/debug/solver: /home/hjac/Life/Hobbies/Rust/solver/src/Point.rs /home/hjac/Life/Hobbies/Rust/solver/src/main.rs
+/home/hjac/Life/Hobbies/Rust/solver/target/debug/solver: /home/hjac/Life/Hobbies/Rust/solver/src/asymptotic_simpsons.rs /home/hjac/Life/Hobbies/Rust/solver/src/circle_arc.rs /home/hjac/Life/Hobbies/Rust/solver/src/curves.rs /home/hjac/Life/Hobbies/Rust/solver/src/lib.rs /home/hjac/Life/Hobbies/Rust/solver/src/main.rs /home/hjac/Life/Hobbies/Rust/solver/src/point.rs /home/hjac/Life/Hobbies/Rust/solver/src/straight_line.rs
