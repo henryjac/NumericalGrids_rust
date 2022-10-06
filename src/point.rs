@@ -3,10 +3,9 @@ pub struct Point {
     y:f32,
 }
 
-
 impl Point {
     pub fn default() -> Point {
-        Point{x:0.0,y:0.0}
+        Point{x:0_f32,y:0_f32}
     }
 
     pub fn new(x:f32,y:f32) -> Point {
@@ -26,3 +25,22 @@ impl Point {
     }
 }
 
+#[test]
+fn test_default_point() {
+    assert_eq!(Point::default().x, 0_f32);
+    assert_eq!(Point::default().y, 0_f32);
+}
+
+#[test]
+fn test_new_point() {
+    let point = Point::new(1_f32,1_f32);
+    assert_eq!(point.x, 1_f32);
+    assert_eq!(point.y, 1_f32);
+}
+
+#[test]
+fn test_get_funcs() {
+    let point = Point{x: 1_f32, y: 0_f32};
+    assert_eq!(point.get_x(), 1_f32);
+    assert_eq!(point.get_y(), 0_f32);
+}

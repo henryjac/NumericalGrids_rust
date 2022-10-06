@@ -1,4 +1,4 @@
-mod point;
+use crate::curves::Curves;
 
 pub struct StraightLine {
     a:f32, 
@@ -10,12 +10,25 @@ pub struct StraightLine {
     p_max:f32,
 }
 
+/// pub struct StraightLine
+/// Straight lines defined by
+/// | a |       | c |
+/// |   | * t + |   |
+/// | b |       | d |
+/// with t ranging from p_min to p_max
 impl StraightLine {
-    pub fn def() -> StraightLine {
-        let a=1_f32;
-        let b=0_f32;
-        let c=0_f32;
-        let d=0_f32;
+    pub fn unit(side: i8) -> StraightLine {
+        let mut a=0_f32;
+        let mut b=0_f32;
+        let mut c=0_f32;
+        let mut d=0_f32;
+        match side {
+            0 => a=1_f32,
+            1 => {b=1_f32; d=0_f32;},
+            2 => {a=1_f32; c=1_f32;},
+            3 => b=1_f32,
+            _ => println!("StraightLine::unit constructor expects a value between 0->3")
+        }
 
         let p_min=0_f32;
         let p_max=1_f32;
@@ -32,18 +45,40 @@ impl StraightLine {
     pub fn new(a:f32,b:f32,c:f32,d:f32,p_min:f32,p_max:f32) -> StraightLine {
         StraightLine{a,b,c,d,p_min,p_max}
     }
+}
 
-    // Should return Point or None, or raise an exception of invalid value, if
-    // we have similar exception handling in Rust as other languages
-    pub fn get_point(&self,t:f32) -> point::Point {
-        match t<self.p_min || t>self.p_max {
-            true => {
-                println!("Line not defined for values outside ({},{})",self.p_min,self.p_max);
-                return point::Point::default();
-            },
-            false => {
-                return point::Point::new(self.a*t+self.c, self.b*t+self.d)
-            }
-        }
+impl Curves for StraightLine {
+    fn get_pmin(&self) -> f32 {
+        return self.p_min
     }
+    fn get_pmax(&self) -> f32 {
+        return self.p_max
+    }
+    fn xp(&self, t: f32) -> f32 {
+        return self.a*t + self.c
+    }
+    fn yp(&self, t: f32) -> f32 {
+        return self.b*t + self.d
+    }
+    fn dxp(&self, _t: f32) -> f32 {
+        return self.a
+    }
+    fn dyp(&self, _t: f32) -> f32 {
+        return self.b
+    }
+}
+
+#[test]
+fn test_endpoint_unit() {
+    let line = StraightLine::unit(0);
+    assert_eq!(line.xp(line.p_min), 0_f32);
+    assert_eq!(line.xp(line.p_max), 1_f32);
+    assert_eq!(line.yp(line.p_min), 0_f32);
+    assert_eq!(line.yp(line.p_max), 0_f32);
+}
+
+#[test]
+fn test_lengths_unit() {
+    let line = StraightLine::unit(0);
+    assert_eq!(line.integrate(line.p_max), 1_f32);
 }
