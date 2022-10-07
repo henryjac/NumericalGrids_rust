@@ -6,36 +6,39 @@ use crate::objects::point::Point;
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
 pub trait Curves {
-    fn find_t(&self, s: f32) -> f32 {
+    /// Returns the `t` that corresponds to `s` where
+    /// x(t) = X(s), where x(t) is the curve parametrized from
+    /// 0->1 and X(s) is the curve in user coordinates.
+    fn find_s(&self, s: f32) -> f32 {
         let f = |p: f32| -> f32 {
-            return self.integrate(p) - s*self.integrate(self.get_tmax()) 
+            return self.integrate(p) - s*self.integrate(self.get_smax()) 
         };
-        let df = |t: f32| -> f32 {
-            return self.integrand(t)
+        let df = |p: f32| -> f32 {
+            return self.integrand(p)
         };
         return newton(&f, &df, 0_f32)
     }
-    fn integrand(&self, t: f32) -> f32 {
-        return (f32::powf(self.dxt(t),2_f32) + f32::powf(self.dyt(t),2_f32)).sqrt()
+    fn integrand(&self, s: f32) -> f32 {
+        return (f32::powf(self.dxs(s),2_f32) + f32::powf(self.dys(s),2_f32)).sqrt()
     }
     fn integrate(&self, t: f32) -> f32 {
-        let f = |q: f32| -> f32 {
-            self.integrand(q)
+        let f = |p: f32| -> f32 {
+            self.integrand(p)
         };
-        return asi(&f, self.get_tmin(), t)
+        return asi(&f, self.get_smin(), t)
     }
-    fn xy(&self, s: f32) -> Point {
-        let t = self.find_t(s);
-        return Point::new(self.xt(t),self.yt(t))
+    fn xy(&self, t: f32) -> Point {
+        let s = self.find_s(t);
+        return Point::new(self.xs(s),self.ys(s))
     }
 
     // Needs an implmentation for structs who want this trait
-    fn get_tmin(&self) -> f32;
-    fn get_tmax(&self) -> f32;
-    fn xt(&self, t: f32) -> f32;
-    fn yt(&self, t: f32) -> f32;
-    fn dxt(&self, t: f32) -> f32; // Use dual numbers to implement this, make xt and yt take in a template
-    fn dyt(&self, t: f32) -> f32;
+    fn get_smin(&self) -> f32;
+    fn get_smax(&self) -> f32;
+    fn xs(&self, s: f32) -> f32;
+    fn ys(&self, s: f32) -> f32;
+    fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xt and yt take in a template
+    fn dys(&self, s: f32) -> f32;
 }
 
 fn newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, x0: f32) -> f32 {

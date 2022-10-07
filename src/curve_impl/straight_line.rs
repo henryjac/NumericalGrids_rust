@@ -12,8 +12,8 @@ pub struct StraightLine {
     c:f32,
     d:f32,
 
-    p_min:f32,
-    p_max:f32,
+    s_min:f32,
+    s_max:f32,
 }
 
 impl StraightLine {
@@ -32,46 +32,49 @@ impl StraightLine {
             _ => println!("StraightLine::unit constructor expects a value between 0->3")
         }
 
-        let p_min=0_f32;
-        let p_max=1_f32;
+        let s_min=0_f32;
+        let s_max=1_f32;
 
-        StraightLine{a,b,c,d,p_min,p_max}
+        StraightLine{a,b,c,d,s_min,s_max}
     }
 
     /// Line defined by the parameters with
     /// parametrization from 0 to 1.
     pub fn default(a:f32,b:f32,c:f32,d:f32) -> StraightLine {
-        let p_min = 0_f32;
-        let p_max= 1_f32;
-        StraightLine{a,b,c,d,p_min,p_max}
+        let s_min = 0_f32;
+        let s_max= 1_f32;
+        StraightLine{a,b,c,d,s_min,s_max}
     }
 
     /// Line defined by `a`->`d` with parametrization from `p_min` to `p_max`.
-    pub fn new(a:f32,b:f32,c:f32,d:f32,p_min:f32,p_max:f32) -> StraightLine {
-        StraightLine{a,b,c,d,p_min,p_max}
+    pub fn new(a:f32,b:f32,c:f32,d:f32,s_min:f32,s_max:f32) -> StraightLine {
+        StraightLine{a,b,c,d,s_min,s_max}
     }
 }
 
 impl Curves for StraightLine {
     /// Start of curve parametrization.
-    fn get_tmin(&self) -> f32 {
-        return self.p_min
+    fn get_smin(&self) -> f32 {
+        return self.s_min
     }
     /// End of curve parametrization.
-    fn get_tmax(&self) -> f32 {
-        return self.p_max
+    fn get_smax(&self) -> f32 {
+        return self.s_max
     }
-    /// X-value of line at `t`.
-    fn xt(&self, t: f32) -> f32 {
+    /// x-value of line at `s`.
+    fn xs(&self, t: f32) -> f32 {
         return self.a*t + self.c
     }
-    fn yt(&self, t: f32) -> f32 {
+    /// y-value of line at `s`.
+    fn ys(&self, t: f32) -> f32 {
         return self.b*t + self.d
     }
-    fn dxt(&self, _t: f32) -> f32 {
+    /// Derivative of x-value of line at `s`.
+    fn dxs(&self, _t: f32) -> f32 {
         return self.a
     }
-    fn dyt(&self, _t: f32) -> f32 {
+    /// Derivative of y-value of line at `s`.
+    fn dys(&self, _t: f32) -> f32 {
         return self.b
     }
 }
