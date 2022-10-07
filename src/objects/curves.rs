@@ -6,36 +6,36 @@ use crate::objects::point::Point;
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
 pub trait Curves {
-    fn find_p(&self, s: f32) -> f32 {
-        let f = |t: f32| -> f32 {
-            return self.integrate(t) - s*self.integrate(self.get_pmax()) 
+    fn find_t(&self, s: f32) -> f32 {
+        let f = |p: f32| -> f32 {
+            return self.integrate(p) - s*self.integrate(self.get_tmax()) 
         };
         let df = |t: f32| -> f32 {
             return self.integrand(t)
         };
         return newton(&f, &df, 0_f32)
     }
-    fn integrand(&self, p: f32) -> f32 {
-        return (f32::powf(self.dxp(p),2_f32) + f32::powf(self.dyp(p),2_f32)).sqrt()
+    fn integrand(&self, t: f32) -> f32 {
+        return (f32::powf(self.dxt(t),2_f32) + f32::powf(self.dyt(t),2_f32)).sqrt()
     }
-    fn integrate(&self, p: f32) -> f32 {
+    fn integrate(&self, t: f32) -> f32 {
         let f = |q: f32| -> f32 {
             self.integrand(q)
         };
-        return asi(&f, self.get_pmin(), p)
+        return asi(&f, self.get_tmin(), t)
     }
     fn xy(&self, s: f32) -> Point {
-        let p = self.find_p(s);
-        return Point::new(self.xp(p),self.yp(p))
+        let t = self.find_t(s);
+        return Point::new(self.xt(t),self.yt(t))
     }
 
     // Needs an implmentation for structs who want this trait
-    fn get_pmin(&self) -> f32;
-    fn get_pmax(&self) -> f32;
-    fn xp(&self, p: f32) -> f32;
-    fn yp(&self, p: f32) -> f32;
-    fn dxp(&self, p: f32) -> f32; // Use dual numbers to implement this, make xp and yp take in a template
-    fn dyp(&self, p: f32) -> f32;
+    fn get_tmin(&self) -> f32;
+    fn get_tmax(&self) -> f32;
+    fn xt(&self, t: f32) -> f32;
+    fn yt(&self, t: f32) -> f32;
+    fn dxt(&self, t: f32) -> f32; // Use dual numbers to implement this, make xt and yt take in a template
+    fn dyt(&self, t: f32) -> f32;
 }
 
 fn newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, x0: f32) -> f32 {

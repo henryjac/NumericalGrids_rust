@@ -20,23 +20,23 @@ impl CircleArc {
 }
 
 impl Curves for CircleArc {
-    fn get_pmin(&self) -> f32 {
+    fn get_tmin(&self) -> f32 {
         return self.u
     }
-    fn get_pmax(&self) -> f32 {
+    fn get_tmax(&self) -> f32 {
         return self.v
     }
-    fn xp(&self, p: f32) -> f32 {
-        return self.c.get_x() + self.r*(self.u+p).cos()
+    fn xt(&self, t: f32) -> f32 {
+        return self.c.get_x() + self.r*(self.u+t).cos()
     }
-    fn yp(&self, p: f32) -> f32 {
-        return self.c.get_y() + self.r*(self.u+p).sin()
+    fn yt(&self, t: f32) -> f32 {
+        return self.c.get_y() + self.r*(self.u+t).sin()
     }
-    fn dxp(&self, p: f32) -> f32 {
-        return -self.r*p.sin()
+    fn dxt(&self, t: f32) -> f32 {
+        return -self.r*t.sin()
     }
-    fn dyp(&self, p: f32) -> f32 {
-        return self.r*p.cos()
+    fn dyt(&self, t: f32) -> f32 {
+        return self.r*t.cos()
     }
 }
 

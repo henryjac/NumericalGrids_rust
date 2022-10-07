@@ -2,7 +2,6 @@ fn simpson_quad(f: &dyn Fn(f32) -> f32,a: f32,b: f32) -> f32 {
     return (b-a)/6.0 * (f(a) + 4.0*f((a+b)/2.0) + f(b))
 }
 
-// Find a way to input function here
 fn asi_wtol(f: &dyn Fn(f32) -> f32, a: f32, b: f32, tol: f32) -> f32 {
     let c = (a+b)/2.0;
     let i1 = simpson_quad(f,a,b);
@@ -14,6 +13,7 @@ fn asi_wtol(f: &dyn Fn(f32) -> f32, a: f32, b: f32, tol: f32) -> f32 {
     }
 }
 
+/// Calculates the integral of closure `f` from `a` to `b`.
 pub fn asi(f: &dyn Fn(f32) -> f32, a: f32, b: f32) -> f32 {
     return asi_wtol(f,a,b,1e-8)
 }
