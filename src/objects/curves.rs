@@ -1,7 +1,8 @@
 use crate::asymptotic_simpsons::asi;
 use crate::objects::point::Point;
 
-/// trait Curves
+/// pub trait Curves
+///
 /// Trait for general curves where a curve needs
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
@@ -18,14 +19,16 @@ pub trait Curves {
         };
         return newton(&f, &df, 0_f32)
     }
+    /// Returns the value of the integrand for the curve length at `s`.
     fn integrand(&self, s: f32) -> f32 {
         return (f32::powf(self.dxs(s),2_f32) + f32::powf(self.dys(s),2_f32)).sqrt()
     }
-    fn integrate(&self, t: f32) -> f32 {
+    /// Returns the length of the curve from `get_smin()` to `s`.
+    fn integrate(&self, s: f32) -> f32 {
         let f = |p: f32| -> f32 {
             self.integrand(p)
         };
-        return asi(&f, self.get_smin(), t)
+        return asi(&f, self.get_smin(), s)
     }
     fn xy(&self, t: f32) -> Point {
         let s = self.find_s(t);
@@ -41,6 +44,8 @@ pub trait Curves {
     fn dys(&self, s: f32) -> f32;
 }
 
+/// Solves the equation `f=0` using Newton's method with initial guess `x0`.
+/// Requires derivative of `f` `df`.
 fn newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, x0: f32) -> f32 {
     return _newton(&f, &df, x0, 1e-10) 
 }
