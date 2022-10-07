@@ -1,7 +1,7 @@
 use std::f32::consts;
 
-use crate::curves::Curves;
-use crate::point::Point;
+use crate::objects::curves::Curves;
+use crate::objects::point::Point;
 
 /// pub struct CircleArc
 /// Struct for general circle arcs with
@@ -38,4 +38,13 @@ impl Curves for CircleArc {
     fn dyp(&self, p: f32) -> f32 {
         return self.r*p.cos()
     }
+}
+
+#[test]
+fn test_circle_lengths() {
+    let circle = CircleArc::unit();
+    let half_circle_large = CircleArc{r:10_f32, c:Point::new(3_f32,-3_f32), u:0_f32, v:consts::PI};
+    let delta = 1e-8;
+    assert!((circle.integrate(circle.v) - 2_f32*consts::PI).abs() < delta);
+    assert!((half_circle_large.integrate(half_circle_large.v) - 2_f32*consts::PI*10_f32) < delta);
 }

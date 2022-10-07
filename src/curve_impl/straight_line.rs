@@ -1,4 +1,4 @@
-use crate::curves::Curves;
+use crate::objects::curves::Curves;
 
 pub struct StraightLine {
     a:f32, 
@@ -12,9 +12,9 @@ pub struct StraightLine {
 
 /// pub struct StraightLine
 /// Straight lines defined by
-/// | a |       | c |
-/// |   | * t + |   |
-/// | b |       | d |
+/// | a |         | c |
+/// |   | * t  +  |   |
+/// | b |         | d |
 /// with t ranging from p_min to p_max
 impl StraightLine {
     pub fn unit(side: i8) -> StraightLine {
