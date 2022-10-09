@@ -13,7 +13,7 @@ impl Point {
     }
 
     pub fn print(&self) {
-        println!("({x},{y})",x=self.x,y=self.y);
+        println!("({},{})",self.x,self.y);
     }
 
     pub fn get_x(&self) -> f32 {
@@ -22,6 +22,12 @@ impl Point {
 
     pub fn get_y(&self) -> f32 {
         return self.y
+    }
+}
+
+impl std::fmt::Display for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({},{})", self.x, self.y)
     }
 }
 
