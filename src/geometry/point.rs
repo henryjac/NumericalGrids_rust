@@ -4,17 +4,17 @@ pub enum Dimension {
 
 #[derive(Debug)]
 pub struct Point {
-    x:f32,
-    y:f32,
+    x: f32,
+    y: f32,
 }
 
 impl Point {
     pub fn default() -> Point {
-        Point{x:0_f32,y:0_f32}
+        Point{x: 0_f32,y: 0_f32}
     }
 
     pub fn new(x:f32,y:f32) -> Point {
-        Point{x,y}
+        Point{x, y}
     }
 
     pub fn print(&self) {
