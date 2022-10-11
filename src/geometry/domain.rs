@@ -1,18 +1,22 @@
 use crate::geometry::curves;
 use crate::geometry::point;
 
+use byteorder::WriteBytesExt;
+use byteorder::LittleEndian;
+
+use std::fs::File;
+use std::io::Write;
+
 pub struct Domain {
-    boundary: [Box<dyn curves::Curves>; 4],
-    boundary_directions: [bool; 4],
-    n: u16,
-    m: u16,
+    n: u8,
+    m: u8,
     x: Vec<f32>,
     y: Vec<f32>,
 }
 
 impl Domain {
     /// Generates a domain defiend by four curves
-    pub fn new(boundary: [Box<dyn curves::Curves>; 4], n: u16, m: u16) -> Domain {
+    pub fn new(boundary: [Box<dyn curves::Curves>; 4], n: u8, m: u8) -> Domain {
         let (consistent, boundary_directions): (bool, [bool; 4]) = Self::consistency_check(&boundary);
         match consistent {
             true => (),
@@ -34,15 +38,22 @@ impl Domain {
         let ψ0 = |s: f32| -> f32 { 1_f32 - s };
         let ψ1 = |s: f32| -> f32 { s };
 
+        let ξη = |s: f32, dir: bool| -> f32 {
+            match dir {
+                true => s,
+                false => 1_f32 - s,
+            }
+        };
+
         for i in 0..n.into() {
             ξs[i] = (i as f32) / ((n as f32) - 1_f32);
-            γ0[i] = boundary[0].xy(ξs[i]);
-            γ2[i] = boundary[2].xy(ξs[i]);
+            γ0[i] = boundary[0].xy(ξη(ξs[i], boundary_directions[0]));
+            γ2[i] = boundary[2].xy(ξη(ξs[i], boundary_directions[2]));
         }
         for j in 0..m.into() {
             ηs[j] = (j as f32) / ((m as f32) - 1_f32);
-            γ1[j] = boundary[1].xy(ηs[j]);
-            γ3[j] = boundary[3].xy(ηs[j]);
+            γ1[j] = boundary[1].xy(ξη(ηs[j], boundary_directions[0]));
+            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[2]));
         }
 
         for i in 0..n.into() {
@@ -62,7 +73,7 @@ impl Domain {
                 y[i*(m as usize)+j] = xy_value.get_y();
             }
         }
-        Domain{boundary, boundary_directions, n, m, x, y}
+        Domain{n, m, x, y}
     }
 
     /// Checks if the curves making up the boundary ends where other curves start
@@ -87,5 +98,16 @@ impl Domain {
             }
         }
         return (true, boundary_directions)
+    }
+
+    pub fn save_grid(&self, location: &str) -> std::io::Result<i32> {
+        let mut file = File::create(location)?;
+        file.write(&[self.n])?;
+        file.write(&[self.m])?;
+        for i in 0..(self.n*self.m).into() {
+            file.write_f32::<LittleEndian>(self.x[i])?;
+            file.write_f32::<LittleEndian>(self.y[i])?;
+        }
+        Ok(3)
     }
 }
