@@ -4,6 +4,7 @@ use crate::geometry::curves::Curves;
 /// with t ranging from p_min to p_max,
 /// which can be gotten from traits `get_pmin()`
 /// and `get_pmax()` of the Curves trait.
+#[derive(Debug)]
 pub struct StraightLine {
     a:f32, 
     b:f32,
@@ -24,9 +25,9 @@ impl StraightLine {
         let mut d=0_f32;
         match side {
             0 => a=1_f32,
-            1 => {b=1_f32; d=0_f32;},
-            2 => {a=1_f32; c=1_f32;},
-            3 => b=1_f32,
+            1 => {b=1_f32; c=1_f32;},
+            2 => {a=-1_f32; c=1_f32; d=1_f32},
+            3 => {b=-1_f32; d=1_f32},
             // FIXME: Do error handling here instead
             _ => println!("StraightLine::unit constructor expects a value between 0->3")
         }
@@ -80,11 +81,19 @@ impl Curves for StraightLine {
 
 #[test]
 fn test_endpoint_unit() {
-    let x0 = StraightLine::unit(0);
-    assert_eq!(x0.xs(x0.s_min), 0_f32);
-    assert_eq!(x0.xs(x0.s_max), 1_f32);
-    assert_eq!(x0.ys(x0.s_min), 0_f32);
-    assert_eq!(x0.ys(x0.s_max), 0_f32);
+    let lines = [StraightLine::unit(0), StraightLine::unit(1), StraightLine::unit(2), StraightLine::unit(3)];
+    let line_endpoints: [f32; 16] = [
+        0_f32, 1_f32, 0_f32, 0_f32,
+        1_f32, 1_f32, 0_f32, 1_f32,
+        1_f32, 0_f32, 1_f32, 1_f32,
+        0_f32, 0_f32, 1_f32, 0_f32,
+    ];
+    for (i, line) in lines.iter().enumerate() {
+        assert_eq!(line.xs(line.s_min), line_endpoints[i*4]);
+        assert_eq!(line.xs(line.s_max), line_endpoints[i*4+1]);
+        assert_eq!(line.ys(line.s_min), line_endpoints[i*4+2]);
+        assert_eq!(line.ys(line.s_max), line_endpoints[i*4+3]);
+    }
 }
 
 #[test]
