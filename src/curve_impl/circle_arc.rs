@@ -16,6 +16,10 @@ impl CircleArc {
     pub fn unit() -> CircleArc {
         CircleArc{r: 1_f32,c: Point::new(0_f32,0_f32),u: 0_f32,v: 2_f32*consts::PI}
     }
+
+    pub fn new(r: f32, c: Point, u: f32, v: f32) -> CircleArc {
+        CircleArc{ r, c, u, v }
+    }
 }
 
 impl Curves for CircleArc {

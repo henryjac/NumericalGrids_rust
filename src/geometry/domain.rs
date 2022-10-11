@@ -9,7 +9,7 @@ use std::io::Write;
 
 pub struct Domain {
     boundary: [Box<dyn curves::Curves>; 4],
-    boundary_directions: [bool; 4],
+    pub boundary_directions: [bool; 4],
     n: u8,
     m: u8,
     x: Vec<f32>,

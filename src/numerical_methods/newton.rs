@@ -4,7 +4,7 @@
 /// TODO: Needs a good initial guess, implement check for if we have convergence or
 /// even a solution, unsure right now if this exists.
 pub fn newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, x0: f32) -> f32 {
-    return _newton(&f, &df, x0, 1e-7, 1000) 
+    return _newton(&f, &df, x0, 1e-6, 1000) 
 }
 
 // Maybe check for convergence as well in this method
