@@ -8,6 +8,8 @@ use std::fs::File;
 use std::io::Write;
 
 pub struct Domain {
+    boundary: [Box<dyn curves::Curves>; 4],
+    boundary_directions: [bool; 4],
     n: u8,
     m: u8,
     x: Vec<f32>,
@@ -38,22 +40,22 @@ impl Domain {
         let ψ0 = |s: f32| -> f32 { 1_f32 - s };
         let ψ1 = |s: f32| -> f32 { s };
 
-        let ξη = |s: f32, dir: bool| -> f32 {
-            match dir {
-                true => s,
-                false => 1_f32 - s,
+        let ξη = |s: f32, dir: bool, dir_opposite: bool| -> f32 {
+            match dir == dir_opposite {
+                true => 1_f32 - s,
+                false => s,
             }
         };
 
         for i in 0..n.into() {
             ξs[i] = (i as f32) / ((n as f32) - 1_f32);
-            γ0[i] = boundary[0].xy(ξη(ξs[i], boundary_directions[0]));
-            γ2[i] = boundary[2].xy(ξη(ξs[i], boundary_directions[2]));
+            γ0[i] = boundary[0].xy(ξs[i]);
+            γ2[i] = boundary[2].xy(ξη(ξs[i], boundary_directions[2], boundary_directions[0]));
         }
         for j in 0..m.into() {
             ηs[j] = (j as f32) / ((m as f32) - 1_f32);
-            γ1[j] = boundary[1].xy(ξη(ηs[j], boundary_directions[0]));
-            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[2]));
+            γ1[j] = boundary[1].xy(ηs[j]);
+            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[2], boundary_directions[0]));
         }
 
         for i in 0..n.into() {
@@ -64,16 +66,16 @@ impl Domain {
                     ψ0(ηs[j])*γ0[i] +
                     ψ1(ηs[j])*γ2[i];
                 let corner_contr = 
-                    ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0] +
-                    ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1] +
-                    ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[0] +
-                    ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
+                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0] +
+                    -ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0] +
+                    -ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1] +
+                    -ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
                 let xy_value = edge_contr + corner_contr;
                 x[i*(m as usize)+j] = xy_value.get_x();
                 y[i*(m as usize)+j] = xy_value.get_y();
             }
         }
-        Domain{n, m, x, y}
+        Domain{boundary, boundary_directions, n, m, x, y}
     }
 
     /// Checks if the curves making up the boundary ends where other curves start
@@ -100,7 +102,7 @@ impl Domain {
         return (true, boundary_directions)
     }
 
-    pub fn save_grid(&self, location: &str) -> std::io::Result<i32> {
+    pub fn save_grid(&self, location: &str) -> std::io::Result<()> {
         let mut file = File::create(location)?;
         file.write(&[self.n])?;
         file.write(&[self.m])?;
@@ -108,6 +110,24 @@ impl Domain {
             file.write_f32::<LittleEndian>(self.x[i])?;
             file.write_f32::<LittleEndian>(self.y[i])?;
         }
-        Ok(3)
+        Ok(())
+    }
+
+    pub fn save_boundary(&self, location: &str, precision: u8) -> std::io::Result<()> {
+        let mut file = File::create(location)?;
+        file.write(&[precision])?;
+        for i in 0..4 {
+            for j in 0..precision+1 {
+                let s = match self.boundary_directions[i] {
+                    true => (j as f32) / (precision as f32),
+                    false => 1_f32 - (j as f32) / (precision as f32),
+                };
+                let xy = self.boundary[i].xy(s);
+
+                file.write_f32::<LittleEndian>(xy.get_x())?;
+                file.write_f32::<LittleEndian>(xy.get_y())?;
+            }
+        }
+        Ok(())
     }
 }
