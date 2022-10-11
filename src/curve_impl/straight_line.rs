@@ -103,3 +103,11 @@ fn test_lengths_unit() {
     assert_eq!(x0.integrate(x0.s_max), 1_f32);
     assert_eq!(x1.integrate(x1.s_max), 1_f32);
 }
+
+#[test]
+fn test_find_s() {
+    let x0 = StraightLine::unit(0);
+    assert!((0.3 - x0.find_s(0.3).abs() < 1e-12));
+    assert!((0.5 - x0.find_s(0.5).abs() < 1e-12));
+    assert!((0.8 - x0.find_s(0.8).abs() < 1e-12));
+}
