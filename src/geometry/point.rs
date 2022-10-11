@@ -2,7 +2,7 @@ pub enum Dimension {
     DimX, DimY, DimXY
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Point {
     x: f32,
     y: f32,
@@ -52,6 +52,42 @@ impl Point {
     pub fn rotate(&mut self, angle: f32) {
         self.x = self.x*angle.cos()  + self.y*angle.sin();
         self.y = -self.x*angle.sin() + self.y*angle.cos();
+    }
+
+    /// Are the two points approximately equal?
+    pub fn approx_equal(&self, other: &Point) -> bool {
+        self.approx_equal_weps(other, 1e-8)
+    }
+
+    fn approx_equal_weps(&self, other: &Point, eps: f32) -> bool {
+        let x_diff = (self.x - other.x).abs();
+        let y_diff = (self.y - other.y).abs();
+        if x_diff < eps && y_diff < eps {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+impl std::ops::Add for Point {
+    type Output = Self;
+    fn add(self, other: Point) -> Self::Output {
+        Point::new(self.x+other.x, self.y+other.y)
+    }
+}
+
+impl std::ops::Mul<f32> for Point {
+    type Output = Self;
+    fn mul(self, other: f32) -> Self::Output {
+        Point::new(self.x*other, self.y*other)
+    }
+}
+
+impl std::ops::Mul<Point> for f32 {
+    type Output = Point;
+    fn mul(self, other: Point) -> Self::Output {
+        Point::new(self*other.x, self*other.y)
     }
 }
 
