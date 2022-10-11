@@ -1,3 +1,8 @@
+pub enum Dimension {
+    DimX, DimY, DimXY
+}
+
+#[derive(Debug)]
 pub struct Point {
     x:f32,
     y:f32,
@@ -22,6 +27,31 @@ impl Point {
 
     pub fn get_y(&self) -> f32 {
         return self.y
+    }
+
+    pub fn purge(self) {}
+
+    // Following 3 methods should really be an implementation of Vector struct
+    pub fn invert(&mut self) {
+        // TODO: Implement error for if x or y is 0
+        self.x = 1_f32 / self.x;
+        self.y = 1_f32 / self.y;
+    }
+
+    pub fn flip(&mut self, dim: Dimension) {
+        match dim {
+            Dimension::DimX => self.y = -self.y,
+            Dimension::DimY => self.x = -self.x,
+            Dimension::DimXY => {
+                self.x = -self.x;
+                self.y = -self.y;
+            }
+        }
+    }
+
+    pub fn rotate(&mut self, angle: f32) {
+        self.x = self.x*angle.cos()  + self.y*angle.sin();
+        self.y = -self.x*angle.sin() + self.y*angle.cos();
     }
 }
 

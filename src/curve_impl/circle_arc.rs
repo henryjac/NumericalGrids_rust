@@ -1,10 +1,9 @@
 use std::f32::consts;
 
-use crate::objects::curves::Curves;
-use crate::objects::point::Point;
+use crate::geometry::curves::Curves;
+use crate::geometry::point::Point;
 
-/// pub struct CircleArc
-/// Struct for general circle arcs with
+/// General circle arcs with
 /// a radius, center, and start and end angles (in radians)
 pub struct CircleArc {
     r: f32, // Radius

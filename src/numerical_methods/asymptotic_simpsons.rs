@@ -22,7 +22,7 @@ pub fn asi(f: &dyn Fn(f32) -> f32, a: f32, b: f32) -> f32 {
 fn test_asi_polynomials() {
     let x = |t: f32| -> f32 {return t};
     let x2 = |t: f32| -> f32 {return f32::powf(t,2_f32)};
-    let delta: f32 = 1e-8; // Not very good approximation
+    let delta: f32 = 1e-8;
     assert!((asi(&x,0_f32,1_f32) - 0.5).abs() < delta);
     assert!((asi(&x2,-1_f32,1_f32) - 2_f32/3_f32).abs() < delta);
 }

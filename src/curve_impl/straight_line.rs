@@ -1,7 +1,5 @@
-use crate::objects::curves::Curves;
+use crate::geometry::curves::Curves;
 
-/// pub struct StraightLine
-///
 /// Straight lines defined by \[a,b\]*t + \[c,d\]
 /// with t ranging from p_min to p_max,
 /// which can be gotten from traits `get_pmin()`
@@ -29,6 +27,7 @@ impl StraightLine {
             1 => {b=1_f32; d=0_f32;},
             2 => {a=1_f32; c=1_f32;},
             3 => b=1_f32,
+            // FIXME: Do error handling here instead
             _ => println!("StraightLine::unit constructor expects a value between 0->3")
         }
 
@@ -81,15 +80,17 @@ impl Curves for StraightLine {
 
 #[test]
 fn test_endpoint_unit() {
-    let line = StraightLine::unit(0);
-    assert_eq!(line.xt(line.p_min), 0_f32);
-    assert_eq!(line.xt(line.p_max), 1_f32);
-    assert_eq!(line.yt(line.p_min), 0_f32);
-    assert_eq!(line.yt(line.p_max), 0_f32);
+    let x0 = StraightLine::unit(0);
+    assert_eq!(x0.xs(x0.s_min), 0_f32);
+    assert_eq!(x0.xs(x0.s_max), 1_f32);
+    assert_eq!(x0.ys(x0.s_min), 0_f32);
+    assert_eq!(x0.ys(x0.s_max), 0_f32);
 }
 
 #[test]
 fn test_lengths_unit() {
-    let line = StraightLine::unit(0);
-    assert_eq!(line.integrate(line.p_max), 1_f32);
+    let x0 = StraightLine::unit(0);
+    let x1 = StraightLine::unit(2);
+    assert_eq!(x0.integrate(x0.s_max), 1_f32);
+    assert_eq!(x1.integrate(x1.s_max), 1_f32);
 }

@@ -1,9 +1,8 @@
-use crate::asymptotic_simpsons::asi;
-use crate::objects::point::Point;
+use crate::numerical_methods::asymptotic_simpsons::asi;
+use crate::numerical_methods::newton::newton;
+use crate::geometry::point::Point;
 
-/// pub trait Curves
-///
-/// Trait for general curves where a curve needs
+/// General curves where a curve needs
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
 pub trait Curves {
@@ -40,33 +39,6 @@ pub trait Curves {
     fn get_smax(&self) -> f32;
     fn xs(&self, s: f32) -> f32;
     fn ys(&self, s: f32) -> f32;
-    fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xt and yt take in a template
+    fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xs and ys take in a template
     fn dys(&self, s: f32) -> f32;
-}
-
-/// Solves the equation `f=0` using Newton's method with initial guess `x0`.
-/// Requires derivative of `f` `df`.
-fn newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, x0: f32) -> f32 {
-    return _newton(&f, &df, x0, 1e-10) 
-}
-
-// Maybe check for convergence as well in this method
-fn _newton(f: &dyn Fn(f32) -> f32, df: &dyn Fn(f32) -> f32, mut x0: f32, tol: f32) -> f32 {
-    let mut x1: f32 = x0;
-    let mut err = 1_f32;
-    while tol < err {
-        x1 = x0 - f(x0) / df(x0);
-        err = (x1 - x0).abs();
-        x0 = x1;
-    }
-    return x1;
-}
-
-#[test]
-fn test_newton() {
-    let dottie = 0.73908514;
-    let delta = 1e-8;
-    let f = |x: f32| -> f32 {x - x.cos()};
-    let df = |x: f32| -> f32 {1_f32 + x.sin()};
-    assert!((newton(&f,&df,0.5_f32) - dottie).abs() < delta);
 }
