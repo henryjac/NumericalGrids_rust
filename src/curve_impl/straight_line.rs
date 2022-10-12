@@ -28,8 +28,10 @@ impl StraightLine {
             1 => {b=1_f32; c=1_f32;},
             2 => {a=-1_f32; c=1_f32; d=1_f32},
             3 => {b=-1_f32; d=1_f32},
-            // FIXME: Do error handling here instead
-            _ => println!("StraightLine::unit constructor expects a value between 0->3")
+            _ => {
+                println!("StraightLine::unit constructor expects a value between 0..3");
+                std::process::exit(1);
+            }
         }
 
         let s_min=0_f32;

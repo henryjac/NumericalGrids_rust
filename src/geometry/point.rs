@@ -9,11 +9,11 @@ pub struct Point {
 }
 
 impl Point {
-    pub fn default() -> Point {
+    pub fn new() -> Point {
         Point{x: 0_f32,y: 0_f32}
     }
 
-    pub fn new(x:f32,y:f32) -> Point {
+    pub fn from(x: f32, y: f32) -> Point {
         Point{x, y}
     }
 
@@ -33,7 +33,10 @@ impl Point {
 
     // Following 3 methods should really be an implementation of Vector struct
     pub fn invert(&mut self) {
-        // TODO: Implement error for if x or y is 0
+        if self.x == 0_f32 || self.y == 0_f32 {
+            println!("x or y should not be 0");
+            std::process::exit(1);
+        }
         self.x = 1_f32 / self.x;
         self.y = 1_f32 / self.y;
     }
@@ -74,28 +77,28 @@ impl Point {
 impl std::ops::Add for Point {
     type Output = Self;
     fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y)
+        Point::from(self.x + other.x, self.y + other.y)
     }
 }
 
 impl std::ops::Sub for Point {
     type Output = Self;
     fn sub(self, other: Point) -> Self::Output {
-        Point::new(self.x - other.x, self.y - other.y)
+        Point::from(self.x - other.x, self.y - other.y)
     }
 }
 
 impl std::ops::Mul<f32> for Point {
     type Output = Self;
     fn mul(self, other: f32) -> Self::Output {
-        Point::new(self.x*other, self.y*other)
+        Point::from(self.x*other, self.y*other)
     }
 }
 
 impl std::ops::Mul<Point> for f32 {
     type Output = Point;
     fn mul(self, other: Point) -> Self::Output {
-        Point::new(self*other.x, self*other.y)
+        Point::from(self*other.x, self*other.y)
     }
 }
 

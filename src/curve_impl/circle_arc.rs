@@ -14,18 +14,18 @@ pub struct CircleArc {
 
 impl CircleArc {
     pub fn unit() -> CircleArc {
-        CircleArc{ r: 1_f32, c: Point::new(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+        CircleArc{ r: 1_f32, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
     }
 
     pub fn scaled_unit(r: f32) -> CircleArc {
-        CircleArc{ r, c: Point::new(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+        CircleArc{ r, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
     }
 
     /// A quadrant from the unit circle where 0 is the 
     /// first quadrant
     pub fn unit_quadrant(quadrant: u8) -> CircleArc {
         let r = 1_f32;
-        let c = Point::new(0_f32, 0_f32);
+        let c = Point::from(0_f32, 0_f32);
         let u = (quadrant as f32) * std::f32::consts::PI / 2_f32;
         let v = ((quadrant + 1) as f32) * std::f32::consts::PI / 2_f32;
         CircleArc{ r, c, u, v }
@@ -64,7 +64,7 @@ impl Curves for CircleArc {
 #[test]
 fn test_circle_lengths() {
     let circle = CircleArc::unit();
-    let half_circle_large = CircleArc{r:10_f32, c:Point::new(3_f32,-3_f32), u:0_f32, v:consts::PI};
+    let half_circle_large = CircleArc{r:10_f32, c:Point::from(3_f32,-3_f32), u:0_f32, v:consts::PI};
     let delta = 1e-8;
     assert!((circle.integrate(circle.v) - 2_f32*consts::PI).abs() < delta);
     assert!((half_circle_large.integrate(half_circle_large.v) - 2_f32*consts::PI*10_f32) < delta);
@@ -103,8 +103,8 @@ fn test_unit_quadrants() {
 
 #[test]
 fn test_uncenterd_circles() {
-    let c1 = CircleArc::new(2_f32, Point::new(1_f32, -1_f32), 0_f32, 2_f32 * consts::PI);
+    let c1 = CircleArc::new(2_f32, Point::from(1_f32, -1_f32), 0_f32, 2_f32 * consts::PI);
 
-    assert!(c1.xy(0_f32).approx_equal(&Point::new(3_f32, -1_f32)));
-    assert!(c1.xy(0.5).approx_equal(&Point::new(-1_f32, -1_f32)));
+    assert!(c1.xy(0_f32).approx_equal(&Point::from(3_f32, -1_f32)));
+    assert!(c1.xy(0.5).approx_equal(&Point::from(-1_f32, -1_f32)));
 }
