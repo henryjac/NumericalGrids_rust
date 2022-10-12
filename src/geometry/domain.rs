@@ -99,6 +99,7 @@ impl Domain {
             } else if checks[2] || checks[3] {
                 boundary_directions[i] = true;
             } else {
+                println!("Consistency check failed at curve {}",i);
                 return (false, boundary_directions)
             }
         }

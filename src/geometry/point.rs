@@ -59,7 +59,7 @@ impl Point {
 
     /// Are the two points approximately equal?
     pub fn approx_equal(&self, other: &Point) -> bool {
-        self.approx_equal_weps(other, 1e-6)
+        self.approx_equal_weps(other, 1e-5)
     }
 
     /// Are the two points approximately eps equal
