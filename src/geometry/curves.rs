@@ -37,7 +37,7 @@ pub trait Curves {
     }
     fn xy(&self, t: f32) -> Point {
         let s = self.find_s(t);
-        return Point::new(self.xs(s),self.ys(s))
+        return Point::from(self.xs(s),self.ys(s))
     }
     fn save_curve(&self, location: &str, precision: u8) -> std::io::Result<()> {
         let mut file = File::create(location)?;

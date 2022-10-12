@@ -1,5 +1,5 @@
-use crate::geometry::curves;
-use crate::geometry::point;
+use crate::geometry::curves::Curves;
+use crate::geometry::point::Point;
 
 use byteorder::WriteBytesExt;
 use byteorder::LittleEndian;
@@ -8,7 +8,7 @@ use std::fs::File;
 use std::io::Write;
 
 pub struct Domain {
-    boundary: [Box<dyn curves::Curves>; 4],
+    boundary: [Box<dyn Curves>; 4],
     pub boundary_directions: [bool; 4],
     n: u8,
     m: u8,
@@ -18,21 +18,24 @@ pub struct Domain {
 
 impl Domain {
     /// Generates a domain defiend by four curves
-    pub fn new(boundary: [Box<dyn curves::Curves>; 4], n: u8, m: u8) -> Domain {
+    pub fn new(boundary: [Box<dyn Curves>; 4], n: u8, m: u8) -> Domain {
         let (consistent, boundary_directions): (bool, [bool; 4]) = Self::consistency_check(&boundary);
         match consistent {
             true => (),
-            false => println!("Curves are not consistent")
+            false => { 
+                println!("Curves are not consistent");
+                // Maybe do proper error handling some other way
+            }
         }
 
         let mut x = vec![0_f32; (n*m).try_into().unwrap()];
         let mut y = vec![0_f32; (n*m).try_into().unwrap()];
 
         // gamma for curve
-        let mut γ0 = vec![point::Point::default(); n.into()];
-        let mut γ1 = vec![point::Point::default(); m.into()];
-        let mut γ2 = vec![point::Point::default(); n.into()];
-        let mut γ3 = vec![point::Point::default(); m.into()];
+        let mut γ0 = vec![Point::new(); n.into()];
+        let mut γ1 = vec![Point::new(); m.into()];
+        let mut γ2 = vec![Point::new(); n.into()];
+        let mut γ3 = vec![Point::new(); m.into()];
 
         let mut ξs = vec![0_f32; m.into()];
         let mut ηs = vec![0_f32; n.into()];
@@ -55,7 +58,7 @@ impl Domain {
         for j in 0..m.into() {
             ηs[j] = (j as f32) / ((m - 1) as f32);
             γ1[j] = boundary[1].xy(ηs[j]);
-            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[0], boundary_directions[2]));
+            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[1], boundary_directions[3]));
         }
 
         for i in 0..n.into() {
@@ -81,7 +84,7 @@ impl Domain {
     /// Checks if the curves making up the boundary ends where other curves start
     ///
     /// Returns consistency and the direction of the curves in a tuple
-    fn consistency_check(boundary: &[Box<dyn curves::Curves>; 4]) -> (bool, [bool; 4]) {
+    fn consistency_check(boundary: &[Box<dyn Curves>; 4]) -> (bool, [bool; 4]) {
         let mut boundary_directions: [bool; 4] = [true; 4];
         for i in 0..4 {
             let mut checks = [false; 4];
@@ -100,6 +103,18 @@ impl Domain {
             }
         }
         return (true, boundary_directions)
+    }
+
+    pub fn get_n(&self) -> u8 {
+        return self.n
+    }
+
+    pub fn get_m(&self) -> u8 {
+        return self.m
+    }
+
+    pub fn get_xy(&self, i: usize, j: usize) -> Point {
+        return Point::from(self.x[i*(self.m as usize) + j], self.y[i*(self.m as usize) + j])
     }
 
     pub fn save_grid(&self, location: &str) -> std::io::Result<()> {
