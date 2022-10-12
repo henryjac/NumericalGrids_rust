@@ -18,7 +18,7 @@ pub struct StraightLine {
 impl StraightLine {
     /// Line of the unit square, with side being a value
     /// between 0 and 3, with 0 being y=0, 1 being x=1 and so on.
-    pub fn unit(side: i8) -> StraightLine {
+    pub fn unit(side: u8) -> StraightLine {
         let mut a=0_f32;
         let mut b=0_f32;
         let mut c=0_f32;
@@ -46,6 +46,40 @@ impl StraightLine {
         let s_min = 0_f32;
         let s_max= 1_f32;
         StraightLine{a,b,c,d,s_min,s_max}
+    }
+
+    pub fn zero_centered(side: u8, length: f32) -> StraightLine {
+        let mut a=0_f32;
+        let mut b=0_f32;
+        let c: f32;
+        let d: f32;
+        match side {
+            0 => {
+                a = length;
+                c = -length/2_f32;
+                d = -length/2_f32;
+            }
+            1 => {
+                b = length;
+                c = length/2_f32;
+                d = -length/2_f32;
+            }
+            2 => {
+                a = -length;
+                c = length/2_f32;
+                d = length/2_f32;
+            }
+            3 => {
+                b = -length;
+                c = -length/2_f32;
+                d = length/2_f32;
+            }
+            _ => {
+                println!("StraightLine::unit constructor expects a value between 0..3");
+                std::process::exit(1);
+            }
+        }
+        StraightLine{a,b,c,d,s_min:0_f32, s_max: 1_f32}
     }
 
     /// Line defined by `a`->`d` with parametrization from `p_min` to `p_max`.
