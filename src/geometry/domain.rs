@@ -37,8 +37,8 @@ impl Domain {
         let mut γ2 = vec![Point::new(); n.into()];
         let mut γ3 = vec![Point::new(); m.into()];
 
-        let mut ξs = vec![0_f32; m.into()];
-        let mut ηs = vec![0_f32; n.into()];
+        let mut ξs = vec![0_f32; n.into()];
+        let mut ηs = vec![0_f32; m.into()];
 
         let ψ0 = |s: f32| -> f32 { 1_f32 - s };
         let ψ1 = |s: f32| -> f32 { s };
@@ -69,10 +69,10 @@ impl Domain {
                     ψ0(ηs[j])*γ0[i] +
                     ψ1(ηs[j])*γ2[i];
                 let corner_contr = 
-                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0] -
-                    ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0] -
-                    ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1] -
-                    ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
+                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0]
+                    -ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0]
+                    -ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1]
+                    -ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
                 let xy_value = edge_contr + corner_contr;
                 x[i*(m as usize)+j] = xy_value.get_x();
                 y[i*(m as usize)+j] = xy_value.get_y();
