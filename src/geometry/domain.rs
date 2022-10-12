@@ -27,9 +27,8 @@ impl Domain {
                 // Maybe do proper error handling some other way
             }
         }
-
-        let mut x = vec![0_f32; (n*m).try_into().unwrap()];
-        let mut y = vec![0_f32; (n*m).try_into().unwrap()];
+        let mut x = vec![0_f32; (n as u16 * m as u16) as usize];
+        let mut y = vec![0_f32; (n as u16 * m as u16) as usize];
 
         // gamma for curve
         let mut γ0 = vec![Point::new(); n.into()];
@@ -122,7 +121,7 @@ impl Domain {
         let mut file = File::create(location)?;
         file.write(&[self.n])?;
         file.write(&[self.m])?;
-        for i in 0..(self.n*self.m).into() {
+        for i in 0..(self.n as u16 * self.m as u16).into() {
             file.write_f32::<LittleEndian>(self.x[i])?;
             file.write_f32::<LittleEndian>(self.y[i])?;
         }
