@@ -2,6 +2,12 @@ use crate::numerical_methods::asymptotic_simpsons::asi;
 use crate::numerical_methods::newton::newton;
 use crate::geometry::point::Point;
 
+use byteorder::WriteBytesExt;
+use byteorder::LittleEndian;
+
+use std::fs::File;
+use std::io::Write;
+
 /// General curves where a curve needs
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
@@ -32,6 +38,18 @@ pub trait Curves {
     fn xy(&self, t: f32) -> Point {
         let s = self.find_s(t);
         return Point::new(self.xs(s),self.ys(s))
+    }
+    fn save_curve(&self, location: &str, precision: u8) -> std::io::Result<()> {
+        let mut file = File::create(location)?;
+        file.write(&[precision])?;
+        for j in 0..precision+1 {
+            let s = (j as f32) / (precision as f32);
+            let xy = self.xy(s);
+
+            file.write_f32::<LittleEndian>(xy.get_x())?;
+            file.write_f32::<LittleEndian>(xy.get_y())?;
+        }
+        Ok(())
     }
 
     // Needs an implmentation for structs who want this trait

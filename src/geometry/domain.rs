@@ -53,9 +53,9 @@ impl Domain {
             γ2[i] = boundary[2].xy(ξη(ξs[i], boundary_directions[2], boundary_directions[0]));
         }
         for j in 0..m.into() {
-            ηs[j] = (j as f32) / ((m as f32) - 1_f32);
+            ηs[j] = (j as f32) / ((m - 1) as f32);
             γ1[j] = boundary[1].xy(ηs[j]);
-            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[2], boundary_directions[0]));
+            γ3[j] = boundary[3].xy(ξη(ηs[j], boundary_directions[0], boundary_directions[2]));
         }
 
         for i in 0..n.into() {
@@ -66,10 +66,10 @@ impl Domain {
                     ψ0(ηs[j])*γ0[i] +
                     ψ1(ηs[j])*γ2[i];
                 let corner_contr = 
-                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0] +
-                    -ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0] +
-                    -ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1] +
-                    -ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
+                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0] -
+                    ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0] -
+                    ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1] -
+                    ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
                 let xy_value = edge_contr + corner_contr;
                 x[i*(m as usize)+j] = xy_value.get_x();
                 y[i*(m as usize)+j] = xy_value.get_y();

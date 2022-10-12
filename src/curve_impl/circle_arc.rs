@@ -14,11 +14,29 @@ pub struct CircleArc {
 
 impl CircleArc {
     pub fn unit() -> CircleArc {
-        CircleArc{r: 1_f32,c: Point::new(0_f32,0_f32),u: 0_f32,v: 2_f32*consts::PI}
+        CircleArc{ r: 1_f32, c: Point::new(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+    }
+
+    pub fn scaled_unit(r: f32) -> CircleArc {
+        CircleArc{ r, c: Point::new(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+    }
+
+    /// A quadrant from the unit circle where 0 is the 
+    /// first quadrant
+    pub fn unit_quadrant(quadrant: u8) -> CircleArc {
+        let r = 1_f32;
+        let c = Point::new(0_f32, 0_f32);
+        let u = (quadrant as f32) * std::f32::consts::PI / 2_f32;
+        let v = ((quadrant + 1) as f32) * std::f32::consts::PI / 2_f32;
+        CircleArc{ r, c, u, v }
     }
 
     pub fn new(r: f32, c: Point, u: f32, v: f32) -> CircleArc {
         CircleArc{ r, c, u, v }
+    }
+
+    pub fn center(&self) -> Point {
+        return self.c
     }
 }
 
@@ -30,10 +48,10 @@ impl Curves for CircleArc {
         return self.v
     }
     fn xs(&self, s: f32) -> f32 {
-        return self.c.get_x() + self.r*(self.u+s).cos()
+        return self.c.get_x() + self.r * s.cos()
     }
     fn ys(&self, s: f32) -> f32 {
-        return self.c.get_y() + self.r*(self.u+s).sin()
+        return self.c.get_y() + self.r * s.sin()
     }
     fn dxs(&self, s: f32) -> f32 {
         return -self.r*s.sin()
@@ -50,4 +68,43 @@ fn test_circle_lengths() {
     let delta = 1e-8;
     assert!((circle.integrate(circle.v) - 2_f32*consts::PI).abs() < delta);
     assert!((half_circle_large.integrate(half_circle_large.v) - 2_f32*consts::PI*10_f32) < delta);
+}
+
+#[test]
+fn test_unit_quadrants() {
+    let arcs = [CircleArc::unit_quadrant(0), CircleArc::unit_quadrant(1), CircleArc::unit_quadrant(2), CircleArc::unit_quadrant(3)];
+
+    assert!(arcs[0].u == 0.0);
+    assert!(arcs[0].v == std::f32::consts::PI / 2_f32);
+    assert!(arcs[1].u == arcs[0].v);
+    assert!(arcs[1].v == std::f32::consts::PI);
+    assert!(arcs[2].u == arcs[1].v);
+    assert!(arcs[2].v == 3_f32 * std::f32::consts::PI / 2_f32);
+    assert!(arcs[3].u == arcs[2].v);
+    assert!(arcs[3].v == 2_f32 * std::f32::consts::PI);
+
+    assert_eq!(arcs[0].c.get_x(), 0_f32);
+    assert_eq!(arcs[0].c.get_y(), 0_f32);
+
+    let endpoints = [
+        1_f32, 0_f32, 0_f32, 1_f32,
+        0_f32, 1_f32, -1_f32, 0_f32,
+        -1_f32, 0_f32, 0_f32, -1_f32,
+        0_f32, -1_f32, 1_f32, 0_f32
+    ] ;
+    let delta = 1e-6;
+    for (i,arc) in arcs.iter().enumerate() {
+        assert!( (arc.xs(arc.get_smin()) - endpoints[i*4+0]).abs() < delta );
+        assert!( (arc.ys(arc.get_smin()) - endpoints[i*4+1]).abs() < delta );
+        assert!( (arc.xs(arc.get_smax()) - endpoints[i*4+2]).abs() < delta );
+        assert!( (arc.ys(arc.get_smax()) - endpoints[i*4+3]).abs() < delta );
+    }
+}
+
+#[test]
+fn test_uncenterd_circles() {
+    let c1 = CircleArc::new(2_f32, Point::new(1_f32, -1_f32), 0_f32, 2_f32 * consts::PI);
+
+    assert!(c1.xy(0_f32).approx_equal(&Point::new(3_f32, -1_f32)));
+    assert!(c1.xy(0.5).approx_equal(&Point::new(-1_f32, -1_f32)));
 }

@@ -2,7 +2,7 @@ pub enum Dimension {
     DimX, DimY, DimXY
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug,PartialEq)]
 pub struct Point {
     x: f32,
     y: f32,
@@ -59,10 +59,11 @@ impl Point {
         self.approx_equal_weps(other, 1e-6)
     }
 
-    fn approx_equal_weps(&self, other: &Point, eps: f32) -> bool {
+    /// Are the two points approximately eps equal
+    fn approx_equal_weps(&self, other: &Point, ε: f32) -> bool {
         let x_diff = (self.x - other.x).abs();
         let y_diff = (self.y - other.y).abs();
-        if x_diff < eps && y_diff < eps {
+        if x_diff <  ε && y_diff < ε {
             return true
         } else {
             return false
@@ -73,7 +74,14 @@ impl Point {
 impl std::ops::Add for Point {
     type Output = Self;
     fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x+other.x, self.y+other.y)
+        Point::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl std::ops::Sub for Point {
+    type Output = Self;
+    fn sub(self, other: Point) -> Self::Output {
+        Point::new(self.x - other.x, self.y - other.y)
     }
 }
 

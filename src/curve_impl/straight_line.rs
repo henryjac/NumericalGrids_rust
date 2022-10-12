@@ -107,7 +107,7 @@ fn test_lengths_unit() {
 #[test]
 fn test_find_s() {
     let x0 = StraightLine::unit(0);
-    assert!((0.3 - x0.find_s(0.3).abs() < 1e-12));
-    assert!((0.5 - x0.find_s(0.5).abs() < 1e-12));
-    assert!((0.8 - x0.find_s(0.8).abs() < 1e-12));
+    assert!((0.3 - x0.find_s(0.3).abs() < 1e-6));
+    assert!((0.5 - x0.find_s(0.5).abs() < 1e-6));
+    assert!((0.8 - x0.find_s(0.8).abs() < 1e-6));
 }
