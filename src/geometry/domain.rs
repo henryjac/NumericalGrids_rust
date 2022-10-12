@@ -17,7 +17,7 @@ pub struct Domain {
 }
 
 impl Domain {
-    /// Generates a domain defiend by four curves
+    /// Generates a domain defined by four curves
     pub fn new(boundary: [Box<dyn Curves>; 4], n: u8, m: u8) -> Domain {
         let (consistent, boundary_directions): (bool, [bool; 4]) = Self::consistency_check(&boundary);
         match consistent {
