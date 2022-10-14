@@ -14,10 +14,12 @@ pub struct CircleArc {
 }
 
 impl CircleArc {
+    /// The unit circle
     pub fn unit() -> CircleArc {
         CircleArc{ r: 1_f32, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
     }
 
+    /// The unit circle but scaled with radius `r`
     pub fn scaled_unit(r: f32) -> CircleArc {
         CircleArc{ r, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
     }
@@ -32,10 +34,13 @@ impl CircleArc {
         CircleArc{ r, c, u, v }
     }
 
+    /// Circle arc defined with radius `r`, center `c` and start-end angles
+    /// `u` and `v`.
     pub fn new(r: f32, c: Point, u: f32, v: f32) -> CircleArc {
         CircleArc{r, c, u, v}
     }
 
+    /// Returns the center point of the circle arc
     pub fn center(&self) -> Point {
         return self.c
     }

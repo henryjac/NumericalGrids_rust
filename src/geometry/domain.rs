@@ -105,18 +105,25 @@ impl Domain {
         return (true, boundary_directions)
     }
 
+    /// Amount of points in x-direction for the domain
     pub fn get_n(&self) -> u8 {
         return self.n
     }
 
+    /// Amount of points in y-direction for the domain
     pub fn get_m(&self) -> u8 {
         return self.m
     }
 
+    /// The value on the domain at the gridpoint `(i,j)`
     pub fn get_xy(&self, i: usize, j: usize) -> Point {
         return Point::from(self.x[i*(self.m as usize) + j], self.y[i*(self.m as usize) + j])
     }
 
+    /// Saves the grid to `location`.
+    ///
+    /// The first two bytes are the `n` and `m` values, and the remaining are (x,y)
+    /// points.
     pub fn save_grid(&self, location: &str) -> std::io::Result<()> {
         let mut file = File::create(location)?;
         file.write(&[self.n])?;
@@ -128,6 +135,9 @@ impl Domain {
         Ok(())
     }
 
+    /// Saves the boundary curves of the domain to `location` with `precision` being
+    /// the amount of gridpoints on each curve. The first byte is the precision and the
+    /// remaining bytes are the (x,y) points
     pub fn save_boundary(&self, location: &str, precision: u8) -> std::io::Result<()> {
         let mut file = File::create(location)?;
         // Create directory if fail?

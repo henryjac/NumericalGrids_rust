@@ -37,6 +37,7 @@ pub trait Curves {
         };
         return asi(&f, self.get_smin(), s)
     }
+    /// The point in 2D space on the curve at `t`
     fn xy(&self, t: f32) -> Point {
         let s = self.find_s(t);
         return Point::from(
@@ -44,6 +45,9 @@ pub trait Curves {
             self.ys(DualNumber::real(s)).get_a(),
         )
     }
+    /// Saves the curve to `location` with `precision` being how many
+    /// gridpoints we have. The first byte is the precision and the remaining
+    /// are pairs of (x,y) values
     fn save_curve(&self, location: &str, precision: u8) -> std::io::Result<()> {
         let mut file = File::create(location)?;
         file.write(&[precision])?;
@@ -56,12 +60,16 @@ pub trait Curves {
         }
         Ok(())
     }
+    /// Calculates the x-derivative of the curve at `s`, parametrized
+    /// from `get_smin()` to `get_smax()`
     fn dxs(&self, s: f32) -> f32 {
         let xs = |s: DualNumber<f32>| -> DualNumber<f32> {
             self.xs(s)
         };
         duals::diff(&xs, s)
     }
+    /// Calculates the y-derivative of the curve at `s`, parametrized
+    /// from `get_smin()` to `get_smax()`
     fn dys(&self, s: f32) -> f32 {
         let ys = |s: DualNumber<f32>| -> DualNumber<f32> {
             self.ys(s)
@@ -70,10 +78,14 @@ pub trait Curves {
     }
 
     // Needs an implmentation for structs who want this trait
+    /// Minimum value for curve parametrization
     fn get_smin(&self) -> f32;
+    /// Maximum value for curve parametrization
     fn get_smax(&self) -> f32;
+    /// Curve parametrization for x, `DualNumber` to be able
+    /// to automatically take derivative
     fn xs(&self, s: DualNumber<f32>) -> DualNumber<f32>;
+    /// Curve parametrization for y, `DualNumber` to be able
+    /// to automatically take derivative
     fn ys(&self, s: DualNumber<f32>) -> DualNumber<f32>;
-    // fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xs and ys take in a template
-    // fn dys(&self, s: f32) -> f32;
 }

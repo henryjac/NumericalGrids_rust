@@ -1,6 +1,7 @@
 use crate::geometry::curves::Curves;
 use crate::duals::DualNumber;
 
+/// A special curve
 pub struct SpecialCurve;
 
 impl SpecialCurve {

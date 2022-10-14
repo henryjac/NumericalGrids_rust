@@ -5,6 +5,12 @@ use std::fmt::Display;
 
 use num::{One, Zero};
 
+/// Dual numbers are an extension similar to the complex numbers,
+/// where we have ε≠0 and ε²=0.
+/// 
+/// This gives rise to the ability to perform automatic differentiation
+/// of analytical functions using the taylor expansion where terms
+/// of order >= 2 will be 0 due to the nature of dual numbers.
 #[derive(Debug,Copy,Clone)]
 pub struct DualNumber<T> {
     a: T,
@@ -12,21 +18,26 @@ pub struct DualNumber<T> {
 }
 
 impl<T> DualNumber<T> where T: Copy {
+    /// Creates a dual number from generic `a` and `b`
     pub fn from(a: T, b: T) -> DualNumber<T> {
         DualNumber{a, b}
     }
+    /// Creates a dual number from real value `a`
     pub fn real(a: T) -> DualNumber<T> where T: Zero {
         DualNumber {
             a, 
             b: T::zero(),
         }
     }
+    /// Returns the real value of the dual number
     pub fn get_a(&self) -> T {
         self.a
     }
+    /// Returns the dual value of the dual number
     pub fn get_b(&self) -> T {
         self.b
     }
+    /// Inverts the dual number (as in doing 1/w)
     pub fn inv(&self) -> DualNumber<T> 
         where T: Div<Output=T> + Neg<Output=T> + Mul<Output=T> + One,
     {

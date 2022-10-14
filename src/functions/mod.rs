@@ -11,6 +11,8 @@ use std::io::Write;
 
 use nalgebra as na;
 
+/// Functions defined on specific domain with values on the 
+/// discrete points on the domain.
 pub struct GridFunction<'a> {
     domain: &'a Domain,
     values: na::DMatrix<f32>,
@@ -19,6 +21,7 @@ pub struct GridFunction<'a> {
 }
 
 impl<'a> GridFunction<'a> {
+    /// Creates the 0-function on `domain`
     pub fn new(domain: &'a Domain) -> GridFunction {
         let n = domain.get_n();
         let m = domain.get_m();
@@ -26,7 +29,8 @@ impl<'a> GridFunction<'a> {
         GridFunction{domain, values, n, m }
     }
 
-    pub fn from_fnc(fnc: &'a dyn Fn(f32,f32) -> f32, domain: &'a Domain) -> GridFunction {
+    /// Creates a function from `fnc` on `domain`
+    pub fn from_fnc(domain: &'a Domain, fnc: &'a dyn Fn(f32,f32) -> f32,) -> GridFunction {
         let index_fnc = |j: usize, i: usize| -> f32 {
             let xy = domain.get_xy(i,j);
             fnc(xy.get_x(), xy.get_y())
@@ -37,12 +41,16 @@ impl<'a> GridFunction<'a> {
         GridFunction{domain, values, n, m}
     }
 
+    /// Creates a function from `domain` and matrix `values`. 
+    ///
+    /// Sizes needs to be compatible
     pub fn from(domain: &'a Domain, values: na::DMatrix<f32>,) -> GridFunction {
         let n = domain.get_n();
         let m = domain.get_m();
         GridFunction{domain, values, n, m}
     }
-
+    
+    /// Populates `values` with values from `fnc` on the domain
     pub fn generate_function_values(&mut self, fnc: &dyn Fn(f32,f32) -> f32) {
         let index_fnc = |j: usize, i: usize| -> f32 {
             let xy = self.domain.get_xy(i,j);
@@ -51,10 +59,16 @@ impl<'a> GridFunction<'a> {
         self.values = na::DMatrix::from_fn(self.m.into(), self.n.into(), index_fnc);
     }
 
+    /// Prints the `values` with the specific (x,y) coordinate corresponding
     pub fn print(&self) {
         println!("{}",self.values);
+        // TODO: Print (x,y) for each value in values
     }
 
+    /// Saves the values of the function to `location`.
+    ///
+    /// The first two bytes are the size of the domain and the remaining are the
+    /// z-values of the function
     pub fn save_function(&self, location: &str) -> std::io::Result<()> {
         let mut file = File::create(location)?;
         file.write(&[self.n])?;
