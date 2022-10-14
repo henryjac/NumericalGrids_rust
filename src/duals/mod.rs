@@ -3,7 +3,7 @@ extern crate num;
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::fmt::Display;
 
-use num::One;
+use num::{One, Zero};
 
 #[derive(Debug,Copy,Clone)]
 pub struct DualNumber<T> {
@@ -11,9 +11,29 @@ pub struct DualNumber<T> {
     b: T,
 }
 
-impl<T> DualNumber<T> {
+impl<T> DualNumber<T> where T: Copy {
     pub fn from(a: T, b: T) -> DualNumber<T> {
         DualNumber{a, b}
+    }
+    pub fn real(a: T) -> DualNumber<T> where T: Zero {
+        DualNumber {
+            a, 
+            b: T::zero(),
+        }
+    }
+    pub fn get_a(&self) -> T {
+        self.a
+    }
+    pub fn get_b(&self) -> T {
+        self.b
+    }
+    pub fn inv(&self) -> DualNumber<T> 
+        where T: Div<Output=T> + Neg<Output=T> + Mul<Output=T> + One,
+    {
+        DualNumber {
+            a: T::one() / self.a,
+            b: -self.b / (self.a * self.a),
+        }
     }
 }
 
@@ -64,7 +84,7 @@ impl<T> Display for DualNumber<T>
 impl<T> Add for DualNumber<T> 
     where T: Add<Output=T>
 {
-    type Output = Self;
+    type Output = DualNumber<T>;
     fn add(self, other: DualNumber<T>) -> Self::Output { 
         DualNumber {
             a: self.a + other.a,
@@ -83,14 +103,26 @@ impl<T: Add<Output=T>> Add<T> for DualNumber<T> {
     }
 }
 
-impl<T> Sub for DualNumber<T> 
+impl<T> Sub<DualNumber<T>> for DualNumber<T> 
     where T: Sub<Output=T>
 {
-    type Output = Self;
+    type Output = DualNumber<T>;
     fn sub(self, other: DualNumber<T>) -> Self::Output {
         DualNumber {
             a: self.a - other.a,
             b: self.b - other.b,
+        }
+    }
+}
+
+impl<T> Sub<T> for DualNumber<T>
+    where T: Sub<Output=T>
+{
+    type Output = DualNumber<T>;
+    fn sub(self, other: T) -> Self::Output {
+        DualNumber {
+            a: self.a - other,
+            b: self.b
         }
     }
 }
@@ -107,14 +139,38 @@ impl<T> Mul<DualNumber<T>> for DualNumber<T>
     }
 }
 
+impl<T> Mul<T> for DualNumber<T> 
+    where T: Mul<Output=T> + Copy
+{
+    type Output = DualNumber<T>;
+    fn mul(self, other: T) -> DualNumber<T> {
+        DualNumber{
+            a: self.a * other,
+            b: self.b * other,
+        }
+    }
+}
+
 impl<T> Div<DualNumber<T>> for DualNumber<T>
     where T: Copy + Add<Output=T> + Div<Output=T> + Mul<Output=T> + Neg<Output=T>
 {
-    type Output = Self;
+    type Output = DualNumber<T>;
     fn div(self, other: DualNumber<T>) -> Self::Output {
         DualNumber {
             a: self.a / other.a,
             b: -self.a * other.b / (self.a*self.a) + self.b / other.a,
+        }
+    }
+}
+
+impl<T> Div<T> for DualNumber<T> 
+    where T: Div<Output=T> + Copy
+{
+    type Output = DualNumber<T>;
+    fn div(self, other: T) -> DualNumber<T> {
+        DualNumber{
+            a: self.a / other,
+            b: self.b / other,
         }
     }
 }
@@ -172,7 +228,7 @@ impl<'a, T> Div<&'a DualNumber<T>> for &'a DualNumber<T>
 }
 
 pub fn diff<'a, T>(f: &'a dyn Fn(DualNumber<T>) -> DualNumber<T>, x: T) -> T 
-    where T: One
+    where T: One + Copy
 {
     f(DualNumber::from(x,T::one())).b
 }

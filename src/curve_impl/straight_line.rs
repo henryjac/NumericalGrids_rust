@@ -1,4 +1,5 @@
 use crate::geometry::curves::Curves;
+use crate::duals::DualNumber;
 
 /// Straight lines defined by \[a,b\]*t + \[c,d\]
 /// with t ranging from p_min to p_max,
@@ -94,20 +95,12 @@ impl Curves for StraightLine {
         return self.s_max
     }
     /// x-value of line at `s`.
-    fn xs(&self, t: f32) -> f32 {
-        return self.a*t + self.c
+    fn xs(&self, t: DualNumber<f32>) -> DualNumber<f32> {
+        return t*self.a + self.c
     }
     /// y-value of line at `s`.
-    fn ys(&self, t: f32) -> f32 {
-        return self.b*t + self.d
-    }
-    /// Derivative of x-value of line at `s`.
-    fn dxs(&self, _t: f32) -> f32 {
-        return self.a
-    }
-    /// Derivative of y-value of line at `s`.
-    fn dys(&self, _t: f32) -> f32 {
-        return self.b
+    fn ys(&self, t: DualNumber<f32>) -> DualNumber<f32> {
+        return t*self.b + self.d
     }
 }
 

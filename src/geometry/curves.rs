@@ -39,7 +39,10 @@ pub trait Curves {
     }
     fn xy(&self, t: f32) -> Point {
         let s = self.find_s(t);
-        return Point::from(self.xs(s),self.ys(s))
+        return Point::from(
+            self.xs(DualNumber::real(s)).get_a(),
+            self.ys(DualNumber::real(s)).get_a(),
+        )
     }
     fn save_curve(&self, location: &str, precision: u8) -> std::io::Result<()> {
         let mut file = File::create(location)?;
@@ -53,12 +56,24 @@ pub trait Curves {
         }
         Ok(())
     }
+    fn dxs(&self, s: f32) -> f32 {
+        let xs = |s: DualNumber<f32>| -> DualNumber<f32> {
+            self.xs(s)
+        };
+        duals::diff(&xs, s)
+    }
+    fn dys(&self, s: f32) -> f32 {
+        let ys = |s: DualNumber<f32>| -> DualNumber<f32> {
+            self.ys(s)
+        };
+        duals::diff(&ys, s)
+    }
 
     // Needs an implmentation for structs who want this trait
     fn get_smin(&self) -> f32;
     fn get_smax(&self) -> f32;
-    fn xs(&self, s: f32) -> f32;
-    fn ys(&self, s: f32) -> f32;
-    fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xs and ys take in a template
-    fn dys(&self, s: f32) -> f32;
+    fn xs(&self, s: DualNumber<f32>) -> DualNumber<f32>;
+    fn ys(&self, s: DualNumber<f32>) -> DualNumber<f32>;
+    // fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xs and ys take in a template
+    // fn dys(&self, s: f32) -> f32;
 }

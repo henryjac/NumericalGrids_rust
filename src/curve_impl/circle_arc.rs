@@ -2,6 +2,7 @@ use std::f32::consts;
 
 use crate::geometry::curves::Curves;
 use crate::geometry::point::Point;
+use crate::duals::DualNumber;
 
 /// General circle arcs with
 /// a radius, center, and start and end angles (in radians)
@@ -32,7 +33,7 @@ impl CircleArc {
     }
 
     pub fn new(r: f32, c: Point, u: f32, v: f32) -> CircleArc {
-        CircleArc{ r, c, u, v }
+        CircleArc{r, c, u, v}
     }
 
     pub fn center(&self) -> Point {
@@ -47,17 +48,11 @@ impl Curves for CircleArc {
     fn get_smax(&self) -> f32 {
         return self.v
     }
-    fn xs(&self, s: f32) -> f32 {
-        return self.c.get_x() + self.r * s.cos()
+    fn xs(&self, s: DualNumber<f32>) -> DualNumber<f32> {
+        return  s.cos() * self.r + self.c.get_x()
     }
-    fn ys(&self, s: f32) -> f32 {
-        return self.c.get_y() + self.r * s.sin()
-    }
-    fn dxs(&self, s: f32) -> f32 {
-        return -self.r*s.sin()
-    }
-    fn dys(&self, s: f32) -> f32 {
-        return self.r*s.cos()
+    fn ys(&self, s: DualNumber<f32>) -> DualNumber<f32> {
+        return s.sin() * self.r + self.c.get_y()
     }
 }
 
