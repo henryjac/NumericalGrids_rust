@@ -1,47 +1,52 @@
-use std::f32::consts;
-
 use crate::geometry::curves::Curves;
 use crate::geometry::point::Point;
 use crate::duals::DualNumber;
 
+use std::f32::consts;
+
 /// General circle arcs with
 /// a radius, center, and start and end angles (in radians)
-pub struct CircleArc {
+pub struct CircleArc<T> {
     r: f32, // Radius
-    c: Point, // Center
+    c: Point<T>, // Center
     u: f32, // Start angle
     v: f32, // End angle
 }
 
-impl CircleArc {
-    pub fn unit() -> CircleArc {
-        CircleArc{ r: 1_f32, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+impl CircleArc<f32> {
+    /// The unit circle
+    pub fn unit() -> CircleArc<f32> {
+        CircleArc{ r: 1_f32, c: Point::from(0.0,0.0), u: 0_f32, v: 2_f32*consts::PI }
     }
 
-    pub fn scaled_unit(r: f32) -> CircleArc {
-        CircleArc{ r, c: Point::from(0_f32, 0_f32), u: 0_f32, v: 2_f32*consts::PI }
+    /// The unit circle but scaled with radius `r`
+    pub fn scaled_unit(r: f32) -> CircleArc<f32> {
+        CircleArc{ r, c: Point::from(0.0,0.0), u: 0_f32, v: 2_f32*consts::PI }
     }
 
     /// A quadrant from the unit circle where 0 is the 
     /// first quadrant
-    pub fn unit_quadrant(quadrant: u8) -> CircleArc {
+    pub fn unit_quadrant(quadrant: u8) -> CircleArc<f32> {
         let r = 1_f32;
-        let c = Point::from(0_f32, 0_f32);
+        let c = Point::from(0.0,0.0);
         let u = (quadrant as f32) * std::f32::consts::PI / 2_f32;
         let v = ((quadrant + 1) as f32) * std::f32::consts::PI / 2_f32;
         CircleArc{ r, c, u, v }
     }
 
-    pub fn new(r: f32, c: Point, u: f32, v: f32) -> CircleArc {
+    /// Circle arc defined with radius `r`, center `c` and start-end angles
+    /// `u` and `v`.
+    pub fn new(r: f32, c: Point<f32>, u: f32, v: f32) -> CircleArc<f32> {
         CircleArc{r, c, u, v}
     }
 
-    pub fn center(&self) -> Point {
+    /// Returns the center point of the circle arc
+    pub fn center(&self) -> Point<f32> {
         return self.c
     }
 }
 
-impl Curves for CircleArc {
+impl Curves<f32> for CircleArc<f32> {
     fn get_smin(&self) -> f32 {
         return self.u
     }

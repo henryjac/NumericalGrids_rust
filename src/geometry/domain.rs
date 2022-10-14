@@ -7,8 +7,8 @@ use byteorder::LittleEndian;
 use std::fs::File;
 use std::io::Write;
 
-pub struct Domain {
-    boundary: [Box<dyn Curves>; 4],
+pub struct Domain<T> {
+    boundary: [Box<dyn Curves<T>>; 4],
     pub boundary_directions: [bool; 4],
     n: u8,
     m: u8,
@@ -16,9 +16,9 @@ pub struct Domain {
     y: Vec<f32>,
 }
 
-impl Domain {
+impl Domain<f32> {
     /// Generates a domain defined by four curves
-    pub fn new(boundary: [Box<dyn Curves>; 4], n: u8, m: u8) -> Domain {
+    pub fn new(boundary: [Box<dyn Curves<f32>>; 4], n: u8, m: u8) -> Domain<f32> {
         let (consistent, boundary_directions): (bool, [bool; 4]) = Self::consistency_check(&boundary);
         match consistent {
             true => (),
@@ -31,10 +31,10 @@ impl Domain {
         let mut y = vec![0_f32; (n as u16 * m as u16) as usize];
 
         // gamma for curve
-        let mut γ0 = vec![Point::new(); n.into()];
-        let mut γ1 = vec![Point::new(); m.into()];
-        let mut γ2 = vec![Point::new(); n.into()];
-        let mut γ3 = vec![Point::new(); m.into()];
+        let mut γ0 = vec![Point::from(0.0,0.0); n.into()];
+        let mut γ1 = vec![Point::from(0.0,0.0); m.into()];
+        let mut γ2 = vec![Point::from(0.0,0.0); n.into()];
+        let mut γ3 = vec![Point::from(0.0,0.0); m.into()];
 
         let mut ξs = vec![0_f32; n.into()];
         let mut ηs = vec![0_f32; m.into()];
@@ -63,15 +63,15 @@ impl Domain {
         for i in 0..n.into() {
             for j in 0..m.into() {
                 let edge_contr = 
-                    ψ0(ξs[i])*γ3[j] +
-                    ψ1(ξs[i])*γ1[j] +
-                    ψ0(ηs[j])*γ0[i] +
-                    ψ1(ηs[j])*γ2[i];
+                    γ3[j]*ψ0(ξs[i]) +
+                    γ1[j]*ψ1(ξs[i]) +
+                    γ0[i]*ψ0(ηs[j]) +
+                    γ2[i]*ψ1(ηs[j]);
                 let corner_contr = 
-                    -ψ0(ξs[i]) * ψ0(ηs[j]) * γ0[0]
-                    -ψ0(ξs[i]) * ψ1(ηs[j]) * γ2[0]
-                    -ψ1(ξs[i]) * ψ0(ηs[j]) * γ0[(n as usize) - 1]
-                    -ψ1(ξs[i]) * ψ1(ηs[j]) * γ2[(n as usize) - 1];
+                    -γ0[0]*ψ0(ξs[i]) * ψ0(ηs[j])
+                    -γ2[0]*ψ0(ξs[i]) * ψ1(ηs[j])
+                    -γ0[(n as usize) - 1]*ψ1(ξs[i]) * ψ0(ηs[j])
+                    -γ2[(n as usize) - 1]*ψ1(ξs[i]) * ψ1(ηs[j]);
                 let xy_value = edge_contr + corner_contr;
                 x[i*(m as usize)+j] = xy_value.get_x();
                 y[i*(m as usize)+j] = xy_value.get_y();
@@ -83,7 +83,7 @@ impl Domain {
     /// Checks if the curves making up the boundary ends where other curves start
     ///
     /// Returns consistency and the direction of the curves in a tuple
-    fn consistency_check(boundary: &[Box<dyn Curves>; 4]) -> (bool, [bool; 4]) {
+    fn consistency_check(boundary: &[Box<dyn Curves<f32>>; 4]) -> (bool, [bool; 4]) {
         let mut boundary_directions: [bool; 4] = [true; 4];
         for i in 0..4 {
             let mut checks = [false; 4];
@@ -113,7 +113,8 @@ impl Domain {
         return self.m
     }
 
-    pub fn get_xy(&self, i: usize, j: usize) -> Point {
+    /// The value on the domain at the gridpoint `(i,j)`
+    pub fn get_xy(&self, i: usize, j: usize) -> Point<f32> {
         return Point::from(self.x[i*(self.m as usize) + j], self.y[i*(self.m as usize) + j])
     }
 

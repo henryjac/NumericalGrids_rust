@@ -13,7 +13,7 @@ use std::io::Write;
 /// General curves where a curve needs
 /// an implementation of user parametrized x/y and 
 /// dx/dy getters.
-pub trait Curves {
+pub trait Curves<T> {
     /// Returns the `t` that corresponds to `s` where
     /// x(t) = X(s), where x(t) is the curve parametrized from
     /// 0->1 and X(s) is the curve in user coordinates.
@@ -37,7 +37,8 @@ pub trait Curves {
         };
         return asi(&f, self.get_smin(), s)
     }
-    fn xy(&self, t: f32) -> Point {
+    /// The point in 2D space on the curve at `t`
+    fn xy(&self, t: f32) -> Point<f32> {
         let s = self.find_s(t);
         return Point::from(
             self.xs(DualNumber::real(s)).get_a(),
@@ -74,6 +75,4 @@ pub trait Curves {
     fn get_smax(&self) -> f32;
     fn xs(&self, s: DualNumber<f32>) -> DualNumber<f32>;
     fn ys(&self, s: DualNumber<f32>) -> DualNumber<f32>;
-    // fn dxs(&self, s: f32) -> f32; // Use dual numbers to implement this, make xs and ys take in a template
-    // fn dys(&self, s: f32) -> f32;
 }

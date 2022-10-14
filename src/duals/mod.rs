@@ -1,5 +1,3 @@
-extern crate num;
-
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::fmt::Display;
 

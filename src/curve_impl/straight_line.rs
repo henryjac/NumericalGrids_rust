@@ -85,7 +85,7 @@ impl StraightLine {
     }
 }
 
-impl Curves for StraightLine {
+impl<T> Curves<T> for StraightLine {
     /// Start of curve parametrization.
     fn get_smin(&self) -> f32 {
         return self.s_min
