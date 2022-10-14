@@ -1,3 +1,8 @@
+use std::ops::Add;
+use std::ops::Sub;
+use std::ops::Mul;
+use std::fmt::Display;
+
 pub enum Dimension {
     DimX, DimY, DimXY
 }
@@ -34,8 +39,7 @@ impl Point {
     // Following 3 methods should really be an implementation of Vector struct
     pub fn invert(&mut self) {
         if self.x == 0_f32 || self.y == 0_f32 {
-            println!("x or y should not be 0");
-            std::process::exit(1);
+            panic!("x or y should not be 0");
         }
         self.x = 1_f32 / self.x;
         self.y = 1_f32 / self.y;
@@ -74,35 +78,35 @@ impl Point {
     }
 }
 
-impl std::ops::Add for Point {
+impl Add for Point {
     type Output = Self;
     fn add(self, other: Point) -> Self::Output {
         Point::from(self.x + other.x, self.y + other.y)
     }
 }
 
-impl std::ops::Sub for Point {
+impl Sub for Point {
     type Output = Self;
     fn sub(self, other: Point) -> Self::Output {
         Point::from(self.x - other.x, self.y - other.y)
     }
 }
 
-impl std::ops::Mul<f32> for Point {
+impl Mul<f32> for Point {
     type Output = Self;
     fn mul(self, other: f32) -> Self::Output {
         Point::from(self.x*other, self.y*other)
     }
 }
 
-impl std::ops::Mul<Point> for f32 {
+impl Mul<Point> for f32 {
     type Output = Point;
     fn mul(self, other: Point) -> Self::Output {
         Point::from(self*other.x, self*other.y)
     }
 }
 
-impl std::fmt::Display for Point {
+impl Display for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{})", self.x, self.y)
     }

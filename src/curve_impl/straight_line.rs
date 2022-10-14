@@ -29,8 +29,7 @@ impl StraightLine {
             2 => {a=-1_f32; c=1_f32; d=1_f32},
             3 => {b=-1_f32; d=1_f32},
             _ => {
-                println!("StraightLine::unit constructor expects a value between 0..3");
-                std::process::exit(1);
+                panic!("StraightLine::unit constructor expects a value between 0..3");
             }
         }
 
@@ -74,10 +73,7 @@ impl StraightLine {
                 c = -length/2_f32;
                 d = length/2_f32;
             }
-            _ => {
-                println!("StraightLine::unit constructor expects a value between 0..3");
-                std::process::exit(1);
-            }
+            _ => panic!("StraightLine::unit consturctor expects a value between 0..3"),
         }
         StraightLine{a,b,c,d,s_min:0_f32, s_max: 1_f32}
     }

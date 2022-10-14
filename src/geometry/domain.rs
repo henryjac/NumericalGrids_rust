@@ -130,6 +130,10 @@ impl Domain {
 
     pub fn save_boundary(&self, location: &str, precision: u8) -> std::io::Result<()> {
         let mut file = File::create(location)?;
+        // Create directory if fail?
+        // match file {
+        //     Err(e) => File::...
+        // }
         file.write(&[precision])?;
         for i in 0..4 {
             for j in 0..precision+1 {
