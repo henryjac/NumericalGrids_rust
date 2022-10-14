@@ -1,6 +1,8 @@
 use crate::numerical_methods::asymptotic_simpsons::asi;
 use crate::numerical_methods::newton::newton;
 use crate::geometry::point::Point;
+use crate::duals;
+use crate::duals::DualNumber;
 
 use byteorder::WriteBytesExt;
 use byteorder::LittleEndian;
