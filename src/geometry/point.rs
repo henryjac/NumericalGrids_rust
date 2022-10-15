@@ -66,7 +66,7 @@ impl Point<f32> {
         self.y = -self.x*angle.sin() + self.y*angle.cos();
     }
     /// Are the two points approximately equal?
-    pub fn approx_equal(&self, other: &Point<f32>) -> bool {
+    pub fn equal(&self, other: &Point<f32>) -> bool {
         self.approx_equal_weps(other, 1e-5)
     }
 
@@ -76,6 +76,37 @@ impl Point<f32> {
         let x_diff = (self.x - other.x).abs();
         let y_diff = (self.y - other.y).abs();
         return x_diff < ε && y_diff < ε
+    }
+}
+
+impl Point<f64> {
+    pub fn rotate(&mut self, angle: f64) {
+        self.x = self.x*angle.cos()  + self.y*angle.sin();
+        self.y = -self.x*angle.sin() + self.y*angle.cos();
+    }
+    /// Are the two points approximately equal?
+    pub fn equal(&self, other: &Point<f64>) -> bool {
+        self.approx_equal_weps(other, 1e-5)
+    }
+
+    /// Are the two points approximately eps equal
+    fn approx_equal_weps(&self, other: &Point<f64>, ε: f64) -> bool
+    {
+        let x_diff = (self.x - other.x).abs();
+        let y_diff = (self.y - other.y).abs();
+        return x_diff < ε && y_diff < ε
+    }
+}
+
+impl Point<i32> {
+    pub fn equal(&self, other: &Point<i32>) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl Point<i64> {
+    pub fn equal(&self, other: &Point<i64>) -> bool {
+        self.x == other.x && self.y == other.y
     }
 }
 

@@ -90,7 +90,7 @@ impl Domain<f32> {
             for j in 0..2 {
                 for k in 0..2 {
                     checks[j*2+k] = boundary[i].xy(j as f32)
-                        .approx_equal(&boundary[(i+1)%4].xy(k as f32));
+                        .equal(&boundary[(i+1)%4].xy(k as f32));
                 }
             }
             if checks[0] || checks[1] {
