@@ -1,51 +1,54 @@
-use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Mul;
+use num::{Zero, One};
+
+use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::cmp::Eq;
 use std::fmt::Display;
 
 pub enum Dimension {
     DimX, DimY, DimXY
 }
 
-#[derive(Copy, Clone, Debug,PartialEq)]
-pub struct Point {
-    x: f32,
-    y: f32,
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Point<T> {
+    x: T,
+    y: T,
 }
 
-impl Point {
-    pub fn new() -> Point {
-        Point{x: 0_f32,y: 0_f32}
+impl<T> Point<T> 
+    where T: Copy
+{
+    pub fn new() -> Point<T> where T: Zero {
+        Point{x: T::zero(), y: T::zero()}
     }
 
-    pub fn from(x: f32, y: f32) -> Point {
+    pub fn from(x: T, y: T) -> Point<T> {
         Point{x, y}
     }
 
-    pub fn print(&self) {
+    pub fn print(&self) where T: Display {
         println!("({},{})",self.x,self.y);
     }
 
-    pub fn get_x(&self) -> f32 {
+    pub fn get_x(&self) -> T {
         return self.x
     }
 
-    pub fn get_y(&self) -> f32 {
+    pub fn get_y(&self) -> T {
         return self.y
     }
 
     pub fn purge(self) {}
 
     // Following 3 methods should really be an implementation of Vector struct
-    pub fn invert(&mut self) {
-        if self.x == 0_f32 || self.y == 0_f32 {
+    pub fn invert(&mut self) where T: Zero + One + Eq + Div<Output=T> {
+        if self.x == T::zero() || self.y == T::zero() {
             panic!("x or y should not be 0");
         }
-        self.x = 1_f32 / self.x;
-        self.y = 1_f32 / self.y;
+        self.x = T::one() / self.x;
+        self.y = T::one() / self.y;
     }
 
-    pub fn flip(&mut self, dim: Dimension) {
+    pub fn flip(&mut self, dim: Dimension) where T: Neg<Output=T> {
         match dim {
             Dimension::DimX => self.y = -self.y,
             Dimension::DimY => self.x = -self.x,
@@ -55,72 +58,111 @@ impl Point {
             }
         }
     }
+}
 
+impl Point<f32> {
     pub fn rotate(&mut self, angle: f32) {
         self.x = self.x*angle.cos()  + self.y*angle.sin();
         self.y = -self.x*angle.sin() + self.y*angle.cos();
     }
-
     /// Are the two points approximately equal?
-    pub fn approx_equal(&self, other: &Point) -> bool {
+    pub fn equal(&self, other: &Point<f32>) -> bool {
         self.approx_equal_weps(other, 1e-5)
     }
 
     /// Are the two points approximately eps equal
-    fn approx_equal_weps(&self, other: &Point, ε: f32) -> bool {
+    fn approx_equal_weps(&self, other: &Point<f32>, ε: f32) -> bool
+    {
         let x_diff = (self.x - other.x).abs();
         let y_diff = (self.y - other.y).abs();
-        if x_diff <  ε && y_diff < ε {
-            return true
-        } else {
-            return false
-        }
+        return x_diff < ε && y_diff < ε
     }
 }
 
-impl Add for Point {
-    type Output = Self;
-    fn add(self, other: Point) -> Self::Output {
+impl Point<f64> {
+    pub fn rotate(&mut self, angle: f64) {
+        self.x = self.x*angle.cos()  + self.y*angle.sin();
+        self.y = -self.x*angle.sin() + self.y*angle.cos();
+    }
+    /// Are the two points approximately equal?
+    pub fn equal(&self, other: &Point<f64>) -> bool {
+        self.approx_equal_weps(other, 1e-5)
+    }
+
+    /// Are the two points approximately eps equal
+    fn approx_equal_weps(&self, other: &Point<f64>, ε: f64) -> bool
+    {
+        let x_diff = (self.x - other.x).abs();
+        let y_diff = (self.y - other.y).abs();
+        return x_diff < ε && y_diff < ε
+    }
+}
+
+impl Point<i32> {
+    pub fn equal(&self, other: &Point<i32>) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl Point<i64> {
+    pub fn equal(&self, other: &Point<i64>) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl<T> Add for Point<T> 
+    where T: Add<Output=T> + Copy
+{
+    type Output = Point<T>;
+    fn add(self, other: Point<T>) -> Self::Output {
         Point::from(self.x + other.x, self.y + other.y)
     }
 }
 
-impl Sub for Point {
-    type Output = Self;
-    fn sub(self, other: Point) -> Self::Output {
+impl<T> Sub for Point<T> 
+    where T: Sub<Output=T> + Copy
+{
+    type Output = Point<T>;
+    fn sub(self, other: Point<T>) -> Self::Output {
         Point::from(self.x - other.x, self.y - other.y)
     }
 }
 
-impl Mul<f32> for Point {
-    type Output = Self;
-    fn mul(self, other: f32) -> Self::Output {
+impl<T> Neg for Point<T>
+    where T: Neg<Output=T> + Copy
+{
+    type Output = Point<T>;
+    fn neg(self) -> Self::Output {
+        Point::from(-self.x, -self.y)
+    }
+}
+
+impl<T> Mul<T> for Point<T> 
+    where T: Mul<Output=T> + Copy
+{
+    type Output = Point<T>;
+    fn mul(self, other: T) -> Self::Output {
         Point::from(self.x*other, self.y*other)
     }
 }
 
-impl Mul<Point> for f32 {
-    type Output = Point;
-    fn mul(self, other: Point) -> Self::Output {
-        Point::from(self*other.x, self*other.y)
-    }
-}
-
-impl Display for Point {
+impl<T> Display for Point<T> 
+    where T: Display
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{})", self.x, self.y)
     }
 }
 
 #[test]
-fn test_default_point() {
-    assert_eq!(Point::default().x, 0_f32);
-    assert_eq!(Point::default().y, 0_f32);
+fn test_new_point() {
+    assert_eq!(Point::<f32>::new().x, 0_f32);
+    assert_eq!(Point::<f32>::new().y, 0_f32);
 }
 
 #[test]
-fn test_new_point() {
-    let point = Point::new(1_f32,1_f32);
+fn test_from_point() {
+    let point = Point::from(1_f32,1_f32);
     assert_eq!(point.x, 1_f32);
     assert_eq!(point.y, 1_f32);
 }

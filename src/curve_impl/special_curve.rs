@@ -10,7 +10,7 @@ impl SpecialCurve {
     }
 }
 
-impl Curves for SpecialCurve {
+impl<T> Curves<T> for SpecialCurve {
     fn get_smin(&self) -> f32 {
         return -10_f32
     }
