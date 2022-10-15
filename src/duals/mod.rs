@@ -1,3 +1,5 @@
+extern crate num;
+
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::fmt::Display;
 
@@ -75,10 +77,9 @@ impl DualNumber<f32> {
         for _ in 0..a-1 {
             dual = dual * factor;
         }
-        dual
+        dual                                            
     }
 }
-
 impl DualNumber<f64> {
     pub fn sin(&self) -> DualNumber<f64> {
         DualNumber {
@@ -97,6 +98,18 @@ impl DualNumber<f64> {
             a: self.a.exp(),
             b: self.b * self.a.exp(),
         }
+    }
+    pub fn pow(&self, a: u8) -> DualNumber<f64> {
+        match a == 0 {
+            true => return DualNumber::from(0_f64, 0_f64),
+            false => (),
+        }
+        let mut dual = DualNumber::from(self.a, self.b);
+        let factor = DualNumber::from(self.a, self.b);
+        for _ in 0..a-1 {
+            dual = dual * factor;
+        }
+        dual                                            
     }
 }
 
