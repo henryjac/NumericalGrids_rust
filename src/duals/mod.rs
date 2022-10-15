@@ -54,6 +54,18 @@ impl DualNumber<f32> {
             b: self.b * self.a.exp(),
         }
     }
+    pub fn pow(&self, a: u8) -> DualNumber<f32> {
+        match a == 0 {
+            true => return DualNumber::from(0.0, 0.0),
+            false => (),
+        }
+        let mut dual = DualNumber::from(self.a, self.b);
+        let factor = DualNumber::from(self.a, self.b);
+        for _ in 0..a-1 {
+            dual = dual * factor;
+        }
+        dual
+    }
 }
 
 impl DualNumber<f64> {
@@ -67,6 +79,12 @@ impl DualNumber<f64> {
         DualNumber {
             a: self.a.cos(),
             b: -self.b * self.a.sin(),
+        }
+    }
+    pub fn exp(&self) -> DualNumber<f64> {
+        DualNumber {
+            a: self.a.exp(),
+            b: self.b * self.a.exp(),
         }
     }
 }
@@ -229,4 +247,16 @@ pub fn diff<'a, T>(f: &'a dyn Fn(DualNumber<T>) -> DualNumber<T>, x: T) -> T
     where T: One + Copy
 {
     f(DualNumber::from(x,T::one())).b
+}
+
+#[test]
+fn test_differentiation_powers() {
+    let f1 = |x: DualNumber<f32>| -> DualNumber<f32> {
+        x.pow(2)
+    };
+    let f2 = |x: DualNumber<f32>| -> DualNumber<f32> {
+        x.pow(5) + x.pow(2)
+    };
+    assert_eq!(diff(&f1, 5.0), 10.0);
+    assert_eq!(diff(&f2, 2.0), 84.0);
 }
