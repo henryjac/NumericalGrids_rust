@@ -7,13 +7,19 @@ use std::f32::consts;
 /// General circle arcs with
 /// a radius, center, and start and end angles (in radians)
 pub struct CircleArc<T> {
-    r: f32, // Radius
+    r: T, // Radius
     c: Point<T>, // Center
-    u: f32, // Start angle
-    v: f32, // End angle
+    u: T, // Start angle
+    v: T, // End angle
 }
 
-impl CircleArc<f32> {
+impl<T> CircleArc<T> {
+    /// Circle arc defined with radius `r`, center `c` and start-end angles
+    /// `u` and `v`.
+    pub fn from(r: T, c: Point<T>, u: T, v: T) -> CircleArc<T> {
+        CircleArc{r, c, u, v}
+    }
+
     /// The unit circle
     pub fn unit() -> CircleArc<f32> {
         CircleArc{ r: 1_f32, c: Point::from(0.0,0.0), u: 0_f32, v: 2_f32*consts::PI }
@@ -21,7 +27,7 @@ impl CircleArc<f32> {
 
     /// The unit circle but scaled with radius `r`
     pub fn scaled_unit(r: f32) -> CircleArc<f32> {
-        CircleArc{ r, c: Point::from(0.0,0.0), u: 0_f32, v: 2_f32*consts::PI }
+        CircleArc::from(r, Point::from(0.0,0.0), 0_f32, 2_f32*consts::PI)
     }
 
     /// A quadrant from the unit circle where 0 is the 
@@ -31,17 +37,11 @@ impl CircleArc<f32> {
         let c = Point::from(0.0,0.0);
         let u = (quadrant as f32) * std::f32::consts::PI / 2_f32;
         let v = ((quadrant + 1) as f32) * std::f32::consts::PI / 2_f32;
-        CircleArc{ r, c, u, v }
-    }
-
-    /// Circle arc defined with radius `r`, center `c` and start-end angles
-    /// `u` and `v`.
-    pub fn new(r: f32, c: Point<f32>, u: f32, v: f32) -> CircleArc<f32> {
-        CircleArc{r, c, u, v}
+        CircleArc::<f32>::from(r, c, u, v)
     }
 
     /// Returns the center point of the circle arc
-    pub fn center(&self) -> Point<f32> {
+    pub fn center(&self) -> Point<T> where Point<T>: Copy {
         return self.c
     }
 }
@@ -63,8 +63,8 @@ impl Curves<f32> for CircleArc<f32> {
 
 #[test]
 fn test_circle_lengths() {
-    let circle = CircleArc::unit();
-    let half_circle_large = CircleArc{r:10_f32, c:Point::from(3_f32,-3_f32), u:0_f32, v:consts::PI};
+    let circle = CircleArc::<f32>::unit();
+    let half_circle_large = CircleArc::from(10_f32, Point::from(3_f32,-3_f32), 0_f32, consts::PI);
     let delta = 1e-8;
     assert!((circle.integrate(circle.v) - 2_f32*consts::PI).abs() < delta);
     assert!((half_circle_large.integrate(half_circle_large.v) - 2_f32*consts::PI*10_f32) < delta);
@@ -72,7 +72,7 @@ fn test_circle_lengths() {
 
 #[test]
 fn test_unit_quadrants() {
-    let arcs = [CircleArc::unit_quadrant(0), CircleArc::unit_quadrant(1), CircleArc::unit_quadrant(2), CircleArc::unit_quadrant(3)];
+    let arcs = [CircleArc::<f32>::unit_quadrant(0), CircleArc::<f32>::unit_quadrant(1), CircleArc::<f32>::unit_quadrant(2), CircleArc::<f32>::unit_quadrant(3)];
 
     assert!(arcs[0].u == 0.0);
     assert!(arcs[0].v == std::f32::consts::PI / 2_f32);
@@ -94,17 +94,17 @@ fn test_unit_quadrants() {
     ] ;
     let delta = 1e-6;
     for (i,arc) in arcs.iter().enumerate() {
-        assert!( (arc.xs(arc.get_smin()) - endpoints[i*4+0]).abs() < delta );
-        assert!( (arc.ys(arc.get_smin()) - endpoints[i*4+1]).abs() < delta );
-        assert!( (arc.xs(arc.get_smax()) - endpoints[i*4+2]).abs() < delta );
-        assert!( (arc.ys(arc.get_smax()) - endpoints[i*4+3]).abs() < delta );
+        assert!( (arc.xs(DualNumber::real(arc.get_smin())) - DualNumber::real(endpoints[i*4+0])).get_a().abs() < delta );
+        assert!( (arc.ys(DualNumber::real(arc.get_smin())) - DualNumber::real(endpoints[i*4+1])).get_a().abs() < delta );
+        assert!( (arc.xs(DualNumber::real(arc.get_smax())) - DualNumber::real(endpoints[i*4+2])).get_a().abs() < delta );
+        assert!( (arc.ys(DualNumber::real(arc.get_smax())) - DualNumber::real(endpoints[i*4+3])).get_a().abs() < delta );
     }
 }
 
 #[test]
 fn test_uncenterd_circles() {
-    let c1 = CircleArc::new(2_f32, Point::from(1_f32, -1_f32), 0_f32, 2_f32 * consts::PI);
+    let c1 = CircleArc::from(2_f32, Point::from(1_f32, -1_f32), 0_f32, 2_f32 * consts::PI);
 
-    assert!(c1.xy(0_f32).approx_equal(&Point::from(3_f32, -1_f32)));
-    assert!(c1.xy(0.5).approx_equal(&Point::from(-1_f32, -1_f32)));
+    assert!(c1.xy(0_f32).equal(&Point::from(3_f32, -1_f32)));
+    assert!(c1.xy(0.5).equal(&Point::from(-1_f32, -1_f32)));
 }

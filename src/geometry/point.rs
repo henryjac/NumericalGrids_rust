@@ -18,7 +18,7 @@ impl<T> Point<T>
     where T: Copy
 {
     pub fn new() -> Point<T> where T: Zero {
-        Point{x: T::zero(),y: T::zero()}
+        Point{x: T::zero(), y: T::zero()}
     }
 
     pub fn from(x: T, y: T) -> Point<T> {
@@ -155,14 +155,14 @@ impl<T> Display for Point<T>
 }
 
 #[test]
-fn test_default_point() {
-    assert_eq!(Point::default().x, 0_f32);
-    assert_eq!(Point::default().y, 0_f32);
+fn test_new_point() {
+    assert_eq!(Point::<f32>::new().x, 0_f32);
+    assert_eq!(Point::<f32>::new().y, 0_f32);
 }
 
 #[test]
-fn test_new_point() {
-    let point = Point::new(1_f32,1_f32);
+fn test_from_point() {
+    let point = Point::from(1_f32,1_f32);
     assert_eq!(point.x, 1_f32);
     assert_eq!(point.y, 1_f32);
 }
