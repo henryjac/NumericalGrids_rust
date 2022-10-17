@@ -18,6 +18,8 @@ pub struct GridFunction<'a, T> {
     values: DMatrix<f32>,
     n: u8,
     m: u8,
+    h_ξ: f32,
+    h_η: f32,
 }
 
 impl<'a> GridFunction<'a, f32> {
@@ -25,8 +27,10 @@ impl<'a> GridFunction<'a, f32> {
     pub fn new(domain: &'a Domain<f32>) -> GridFunction<f32> {
         let n = domain.get_n();
         let m = domain.get_m();
+        let h_ξ = 1_f32 / (n as f32);
+        let h_η = 1_f32 / (n as f32);
         let values = DMatrix::from_fn(n.into(),m.into(),|_,_| 0.0);
-        GridFunction{domain, values, n, m }
+        GridFunction{domain, values, n, m, h_ξ, h_η}
     }
 
     /// Creates a function from `fnc` on `domain`
@@ -37,8 +41,10 @@ impl<'a> GridFunction<'a, f32> {
         };
         let n = domain.get_n();
         let m = domain.get_m();
+        let h_ξ = 1_f32 / (n as f32);
+        let h_η = 1_f32 / (n as f32);
         let values = DMatrix::from_fn(m.into(), n.into(), index_fnc);
-        GridFunction{domain, values, n, m}
+        GridFunction{domain, values, n, m, h_ξ, h_η}
     }
 
     /// Creates a function from `domain` and matrix `values`. 
@@ -47,7 +53,9 @@ impl<'a> GridFunction<'a, f32> {
     pub fn from(domain: &'a Domain<f32>, values: DMatrix<f32>,) -> GridFunction<f32> {
         let n = domain.get_n();
         let m = domain.get_m();
-        GridFunction{domain, values, n, m}
+        let h_ξ = 1_f32 / (n as f32);
+        let h_η = 1_f32 / (n as f32);
+        GridFunction{domain, values, n, m, h_ξ, h_η}
     }
 
     pub fn generate_function_values(&mut self, fnc: &dyn Fn(f32,f32) -> f32) {
@@ -74,6 +82,43 @@ impl<'a> GridFunction<'a, f32> {
             }
         };
         Ok(())
+    }
+
+    fn partial_derivative(
+        &self, f: &dyn Fn(usize, usize) -> f32, dir: DiffDirection, i: usize, j: usize) -> f32 
+    {
+        let last_index: usize;
+        let current_index: usize;
+        let is: [usize; 4];
+        let js: [usize; 4];
+        let h: f32;
+        match dir {
+            DiffDirection::Xi => {
+                current_index = i;
+                last_index = (self.n-1) as usize;
+                h = self.h_ξ;
+                is = set_indices(i, true);
+                js = set_indices(j, false);
+            },
+            DiffDirection::Eta => {
+                current_index = j;
+                last_index = (self.m-1) as usize;
+                h = self.h_η;
+                is = set_indices(i, false);
+                js = set_indices(j, true);
+            }
+        }
+        match current_index {
+            0 => {
+                one_sided_diff(-1, f(i,j), f(is[0],js[0]), f(is[2],js[2]), h)
+            },
+            last_index => {
+                one_sided_diff(1, f(i,j), f(is[1],js[1]), f(is[3],js[3]), h)
+            },
+            _ => {
+                central_diff(f(is[0],js[0]), f(is[1],js[1]), h)
+            }
+        }
     }
 }
 
@@ -108,5 +153,29 @@ impl<'a, 'b> Add<&'b GridFunction<'b, f32>> for &'a GridFunction<'a, f32> {
             false => panic!("Can't add functions defined on different domains."),
         };
         GridFunction::from(self.domain, values)
+    }
+}
+
+enum DiffDirection {
+    Xi,
+    Eta,
+}
+
+fn one_sided_diff(side: i8, s0: f32, s1: f32, s2: f32, h: f32) -> f32 {
+    return (side as f32)*(3_f32*s0 - 4_f32*s1 + s2) / (2_f32*h)
+}
+
+fn central_diff(sp1: f32, sm1: f32, h: f32) -> f32 {
+    return (sp1 - sm1) / (2_f32*h)
+}
+
+fn set_indices(i0: usize, change: bool) -> [usize; 4] {
+    match change {
+        true => {
+            return [i0+1, i0-1, i0+2, i0-2] 
+        },
+        false => {
+            return [i0, i0, i0, i0]
+        }
     }
 }
