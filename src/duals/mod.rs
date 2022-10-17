@@ -9,6 +9,22 @@ pub struct DualNumber<T> {
     b: T,
 }
 
+pub trait GetA {
+    fn get_a(&self) -> f32;
+}
+
+impl GetA for f32 {
+    fn get_a(&self) -> f32 {
+        *self
+    }
+}
+
+impl GetA for DualNumber<f32> {
+    fn get_a(&self) -> f32 {
+        self.a
+    }
+}
+
 impl<T> DualNumber<T> where T: Copy {
     pub fn from(a: T, b: T) -> DualNumber<T> {
         DualNumber{a, b}
