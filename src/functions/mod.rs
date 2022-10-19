@@ -78,7 +78,7 @@ impl<'a> GridFunction<'a, f32> {
     }
 
     /// Prints the `values` with the specific (x,y) coordinate corresponding
-    pub fn print(&self) {
+    pub fn print_values(&self) {
         println!("{}",self.values);
         // TODO: Print (x,y) for each value in values
     }
@@ -288,6 +288,8 @@ fn set_indices(i0: usize, change: bool) -> [usize; 4] {
     match change {
         true => {
             match i0 {
+                // If i0 is 0 or 1 we don't use the negative values
+                // and so we dont do the subtractions since we have usize values
                 0 => [i0+1, i0, i0+2, i0],
                 1 => [i0+1, i0-1, i0+2, i0],
                 _ => [i0+1, i0-1, i0+2, i0-2],

@@ -142,6 +142,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "numerical_grids"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "nalgebra",
+ "num",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -191,15 +200,6 @@ dependencies = [
  "num-traits",
  "paste",
  "wide",
-]
-
-[[package]]
-name = "solver"
-version = "0.1.0"
-dependencies = [
- "byteorder",
- "nalgebra",
- "num",
 ]
 
 [[package]]
