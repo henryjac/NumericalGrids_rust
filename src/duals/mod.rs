@@ -17,6 +17,34 @@ pub struct DualNumber<T> {
     b: T,
 }
 
+pub trait GetA {
+    fn get_a(&self) -> f32;
+}
+
+impl GetA for f32 {
+    fn get_a(&self) -> f32 {
+        *self
+    }
+}
+
+impl GetA for f64 {
+    fn get_a(&self) -> f32 {
+        *self as f32
+    }
+}
+
+impl GetA for DualNumber<f32> {
+    fn get_a(&self) -> f32 {
+        self.a
+    }
+}
+
+impl GetA for DualNumber<f64> {
+    fn get_a(&self) -> f32 {
+        self.a as f32
+    }
+}
+
 impl<T> DualNumber<T> where T: Copy {
     /// Creates a dual number from generic `a` and `b`
     pub fn from(a: T, b: T) -> DualNumber<T> {

@@ -1,7 +1,6 @@
-use num::{Zero, One};
+use num::Zero;
 
-use std::ops::{Add, Sub, Mul, Div, Neg};
-use std::cmp::Eq;
+use std::ops::{Add, Sub, Mul, Neg};
 use std::fmt::Display;
 
 pub enum Dimension {
@@ -38,26 +37,6 @@ impl<T> Point<T>
     }
 
     pub fn purge(self) {}
-
-    // Following 3 methods should really be an implementation of Vector struct
-    pub fn invert(&mut self) where T: Zero + One + Eq + Div<Output=T> {
-        if self.x == T::zero() || self.y == T::zero() {
-            panic!("x or y should not be 0");
-        }
-        self.x = T::one() / self.x;
-        self.y = T::one() / self.y;
-    }
-
-    pub fn flip(&mut self, dim: Dimension) where T: Neg<Output=T> {
-        match dim {
-            Dimension::DimX => self.y = -self.y,
-            Dimension::DimY => self.x = -self.x,
-            Dimension::DimXY => {
-                self.x = -self.x;
-                self.y = -self.y;
-            }
-        }
-    }
 }
 
 impl Point<f32> {
