@@ -19,9 +19,21 @@ impl GetA for f32 {
     }
 }
 
+impl GetA for f64 {
+    fn get_a(&self) -> f32 {
+        *self as f32
+    }
+}
+
 impl GetA for DualNumber<f32> {
     fn get_a(&self) -> f32 {
         self.a
+    }
+}
+
+impl GetA for DualNumber<f64> {
+    fn get_a(&self) -> f32 {
+        self.a as f32
     }
 }
 
