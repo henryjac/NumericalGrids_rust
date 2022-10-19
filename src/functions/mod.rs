@@ -98,7 +98,24 @@ impl<'a> GridFunction<'a, f32> {
         self.values[(i as u16 * self.m as u16 + j as u16) as usize]
     }
 
-    pub fn pd_xy(&'a self) -> [GridFunction<'a, f32>; 2] {
+    pub fn pd_xy(self) -> [GridFunction<'a, f32>; 2] {
+        let mut values_pdx = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
+        let mut values_pdy = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
+        for i in 0..self.n as usize {
+            for j in 0..self.m as usize {
+                let partial_return_vals = self.partial_derivative(i,j);
+                values_pdx[i * self.m as usize + j] = partial_return_vals[0];
+                values_pdy[i * self.m as usize + j] = partial_return_vals[1];
+            }
+        }
+        [
+            GridFunction::from(&self.domain, values_pdx),
+            GridFunction::from(&self.domain, values_pdy)
+        ]
+    }
+
+    /// Calculates pdx and pdy from a reference to &self
+    pub fn pd_xy_ref(&'a self) -> [GridFunction<'a, f32>; 2] {
         let mut values_pdx = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
         let mut values_pdy = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
         for i in 0..self.n as usize {
@@ -124,6 +141,7 @@ impl<'a> GridFunction<'a, f32> {
         GridFunction::from(&self.domain, values)
     }
 
+    /// Calculates pdx from a reference to &self
     pub fn pdx_ref(&self) -> GridFunction<'a, f32> {
         let mut values = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
         for i in 0..self.n as usize {
@@ -144,6 +162,7 @@ impl<'a> GridFunction<'a, f32> {
         GridFunction::from(&self.domain, values)
     }
 
+    /// Calculates pdy from a reference to &self
     pub fn pdy_ref(&self) -> GridFunction<'a, f32> {
         let mut values = DMatrix::from_fn(self.n.into(), self.m.into(),|_,_| 0.0); 
         for i in 0..self.n as usize {
@@ -155,7 +174,7 @@ impl<'a> GridFunction<'a, f32> {
     }
 
     pub fn laplace(&self) -> GridFunction<f32> {
-        let [dx,dy] = self.pd_xy();
+        let [dx,dy] = self.pd_xy_ref();
         dx.pdx() + dy.pdy()
     }
 
