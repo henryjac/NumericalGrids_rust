@@ -44,7 +44,7 @@ impl<'a> GridFunction<'a, f32> {
     }
 
     /// Creates a function from `fnc` on `domain`
-    pub fn from_fnc(domain: &'a Domain<f32>, fnc: &'a dyn Fn(f32,f32) -> f32,) -> GridFunction<f32> {
+    pub fn from_fnc(domain: &'a Domain<f32>, fnc: &'a dyn Fn(f32,f32) -> f32,) -> GridFunction<'a, f32> {
         let index_fnc = |j: usize, i: usize| -> f32 {
             let xy = domain.get_xy(i,j);
             fnc(xy.get_x(), xy.get_y())
